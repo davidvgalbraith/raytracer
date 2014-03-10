@@ -83,7 +83,7 @@ public class Ray {
 	}
 	
 	public String toString() {
-		return "a ray starting at " + pos + " and going " + dir;
+		return "a ray from " + pos + " going " + dir;
 	}
 
 }

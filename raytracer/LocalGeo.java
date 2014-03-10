@@ -13,7 +13,9 @@ public class LocalGeo {
 		this.y = pos.getY();
 		this.z = pos.getZ();
 	}
-	
+	public String toString() {
+		return "Local Geo of " + pos + " and " + normal;
+	}
 	public LocalGeo() {
 		this.pos = null;
 		this.normal = null;

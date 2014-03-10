@@ -10,6 +10,10 @@ public class Intersection {
 		this.primitive = primitive;
 	}
 
+	public String toString() {
+		return "Intersection: \n LocalGeo: " + localGeo + "\nPrimitive: " + primitive + "\n";
+	}
+	
 	public LocalGeo getLocalGeo() {
 		return localGeo;
 	}

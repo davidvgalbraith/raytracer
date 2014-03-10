@@ -13,6 +13,10 @@ public class GeometricPrimitive implements Primitive {
 		this.mat = mat;
 	}
 
+	public String toString() {
+		return "Gprim: " + shape;
+	}
+	
 	@Override
 	public boolean intersect(Ray ray, Doublet thit, Intersection in) {
 		Ray oray = objToWorld.transform(ray);

@@ -16,6 +16,11 @@ public class Normal {
 			this.z = z/norm;
 		}
 	}
+	
+	public String toString() {
+		return "Normal: " + x + ", " + y + ", " + z;
+	}
+	
 	public static Normal normalize(Vector a) {
 		return new Normal(a.getX(), a.getY(), a.getZ());
 	}

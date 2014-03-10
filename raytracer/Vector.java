@@ -12,6 +12,10 @@ public class Vector {
 		this.y = 0;
 		this.z = 0;
 	}
+	
+	Vector cross(Vector a) {
+		return new Vector(y * a.getZ() - z * a.getY(), z * a.getX() - x * a.getZ(), x * a.getY() - y * a.getX());
+	}
 	Vector plus(Vector a) {
 		return new Vector(x + a.getX(), y + a.getY(), z + a.getZ());
 	}

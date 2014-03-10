@@ -16,11 +16,11 @@ public class Scene {
 
 	void render() {
 		Sample sample = new Sample(1, -0.5 / sampler.maxy);
-		Ray ray = new Ray(null, null, 1, 100);
+		Ray ray = new Ray(null, null, 1, 1000000000);
 		Color color = new Color(0, 0, 0);
 		while (sampler.generateSample(sample)) {
 			camera.generateRay(sample, ray);
-			System.out.println(sample + " generaged " + ray);
+//			System.out.println(sample + " generaged " + ray);
 			raytracer.trace(ray, 5, color);
 
 			film.commit(sample, color);

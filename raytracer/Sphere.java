@@ -33,7 +33,9 @@ public class Sphere implements Shape {
 		}
 		//System.out.println("Yes!");
 		double thitt = g.smaller();
+//		System.out.println("Thit is " + thitt);
 		thit.setD(thitt);
+		local.setPos(ray.eval(thitt));
 		local.setNormal(Normal.normalize(ray.eval(thitt).minus(center)));
 		return true;
 	}

@@ -12,7 +12,7 @@ public class Main {
 		Vector ur = new Vector(1, 1, -1);
 		Vector lr = new Vector(1, -1, -1);
 		Vector ll = new Vector(-1, -1, -1);
-		Camera c = new Camera(eyepos, null, null, ul, ur, lr, ll);
+		Camera c = new Camera(eyepos, ul, ur, ll, lr);
 		Film f = new Film(100, 100);
 		Sphere sph = new Sphere(new Point(0, 0, -2), 1.0);
 		double[][] id = new double[4][4];
