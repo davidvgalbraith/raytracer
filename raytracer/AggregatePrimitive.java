@@ -50,5 +50,11 @@ public class AggregatePrimitive implements Primitive {
 		System.err.println("Impossible method call to getBRDF in AggregatePrimitive");
 		System.exit(1);
 	}
-
+	public String toString() {
+		String s = "Aggregate containing:\n";
+		for (Primitive prim : list) {
+			s += "\t" + prim.toString() + "\n";
+		}
+		return s;
+	}
 }

@@ -9,8 +9,8 @@ public class Film {
 		picture = new int[height][width];
 	}
 	void commit(Sample samp, Color c) {
-		int col = picture[0].length - (int) (samp.getX() * picture[0].length) - 1;
-		int row = (int) (samp.getY() * picture.length);
+		int col = (int) (samp.getX() * picture[0].length);
+		int row = picture.length - ((int) (samp.getY() * picture.length)) - 1;
 		int red = (int) (c.getR() * 255);
 		int green = (int) (c.getG() * 255);
 		int blue = (int) (c.getB() * 255);

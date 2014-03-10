@@ -6,6 +6,7 @@ package raytracer;
 
 
 public class NoSquareException extends Exception {
+	static final long serialVersionUID = 2;
 
 	public NoSquareException() {
 		super();

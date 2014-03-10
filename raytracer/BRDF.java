@@ -12,6 +12,10 @@ public class BRDF {
 		this.ka = ka;
 		this.kr = kr;
 	}
+	public BRDF() {}
+	public String toString() {
+		return "BRDF:\nkd = " + kd + "\nks = " + ks + "\nka = " + ka + "\nkr = " + kr;
+	}
 	public Color getKd() {
 		return kd;
 	}

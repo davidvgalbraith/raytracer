@@ -32,6 +32,10 @@ public class Normal {
 		return new Normal(x - a.getX(), y - a.getY(), z - a.getZ());
 	}
 	
+	public Vector vectorize() {
+		return new Vector(x, y, z);
+	}
+	
 	public double getX() {
 		return x;
 	}

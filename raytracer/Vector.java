@@ -42,8 +42,11 @@ public class Vector {
 		double norm = Math.sqrt(x * x + y * y + z * z);
 		if (norm == 0) {
 			System.err.println("Divided by zero in " + this + ".normalize()");
-			return new Vector(0, 0, 0);
+			Integer k = null;
+			k.floatValue();
+			//return new Vector(0, 0, 0);
 		}
+
 		return new Vector(x/norm, y/norm, z/norm);
 	}
 	

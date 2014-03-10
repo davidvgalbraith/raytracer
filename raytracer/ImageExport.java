@@ -63,7 +63,7 @@ public class ImageExport {
      */
     public static BufferedImage convertRGBImageWithHeader(int[][] rgbValue,String strHeader){
         //We add extra pixels on top of the image for the strHeader
-        int headerHeight=13;
+        int headerHeight=0;
         int height = rgbValue.length+headerHeight;
         int width = rgbValue[0].length;
 
@@ -78,7 +78,7 @@ public class ImageExport {
         Graphics2D g=bufferedImage.createGraphics();
         g.setFont(new Font("Monospaced", Font.BOLD, 14) );
         g.setColor(Color.white);
-        g.drawString(strHeader,0,10);
+        //g.drawString(strHeader,0,10);
 
         return bufferedImage;  
     }

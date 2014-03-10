@@ -6,7 +6,7 @@ package raytracer;
 
 
 public class IllegalDimensionException extends Exception {
-
+	static final long serialVersionUID = 2;
 	public IllegalDimensionException() {
 		super();
 		// TODO Auto-generated constructor stub
