@@ -19,7 +19,6 @@ public class Scene {
 		Ray ray = new Ray(null, null, 1, 100);
 		Color color = new Color(0, 0, 0);
 		while (sampler.generateSample(sample)) {
-			System.out.println(sample);
 			camera.generateRay(sample, ray);
 
 			raytracer.trace(ray, 5, color);

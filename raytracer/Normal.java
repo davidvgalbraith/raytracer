@@ -16,7 +16,9 @@ public class Normal {
 			this.z = z/norm;
 		}
 	}
-	
+	public static Normal normalize(Vector a) {
+		return new Normal(a.getX(), a.getY(), a.getZ());
+	}
 	public Normal plus(Normal a) {
 		return new Normal(x + a.getX(), y + a.getY(), z + a.getZ());
 	}

@@ -28,7 +28,6 @@ public class RayTracer {
 		}
 
 		if (!p.intersect(ray, d, in)) {
-
 			// No intersection
 			color.setB(0.0);
 			color.setG(0.0);
@@ -38,7 +37,7 @@ public class RayTracer {
 		}
 
 		// Obtain the brdf at intersection point
-
+		System.out.println("It intersected!");
 		BRDF brdf = new BRDF(null, null, null, null);
 		in.getPrimitive().getBRDF(in.getLocalGeo(), brdf);
 		color.setR(1.0);

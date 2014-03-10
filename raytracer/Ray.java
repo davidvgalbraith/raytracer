@@ -17,7 +17,13 @@ public class Ray {
 			this.z = pos.getZ();
 		}
 	}
-
+	Point eval(double dub) {
+		if (dub < tmin || dub > tmax) {
+			System.err.println("Asked me to eval outside range");
+			System.exit(1);
+		}
+		return new Point(x + dir.getX() * dub, y + dir.getY() * dub, z + dir.getZ() * dub);
+	}
 	public double getX() {
 		return x;
 	}
@@ -74,6 +80,10 @@ public class Ray {
 
 	public void setTmax(double tmax) {
 		this.tmax = tmax;
+	}
+	
+	public String toString() {
+		return "a ray starting at " + pos + " and going " + dir;
 	}
 
 }

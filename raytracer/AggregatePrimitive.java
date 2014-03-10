@@ -1,5 +1,6 @@
 package raytracer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -7,6 +8,9 @@ public class AggregatePrimitive implements Primitive {
 	List<Primitive> list;
 	public AggregatePrimitive(List<Primitive> list) {
 		this.list = list;
+	}
+	public AggregatePrimitive() {
+		this.list = new ArrayList<Primitive>();
 	}
 	public void add(Primitive p) {
 		this.list.add(p);

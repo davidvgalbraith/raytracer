@@ -5,6 +5,14 @@ public class GeometricPrimitive implements Primitive {
 	Shape shape;
 	Material mat;
 
+	public GeometricPrimitive(Transformation objToWorld,
+			Transformation worldToObj, Shape shape, Material mat) {
+		this.objToWorld = objToWorld;
+		this.worldToObj = worldToObj;
+		this.shape = shape;
+		this.mat = mat;
+	}
+
 	@Override
 	public boolean intersect(Ray ray, Doublet thit, Intersection in) {
 		Ray oray = objToWorld.transform(ray);

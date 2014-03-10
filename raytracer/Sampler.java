@@ -10,12 +10,13 @@ public class Sampler {
 	}
 
 	boolean generateSample(Sample x) {
-		if (x.getY() >= 1) {
-			return false;
-		}
+
 		if (x.getX() + 1.0/maxx >= 1) {
 			x.setX(0.5/maxx);
 			x.setY(x.getY() + 1.0/maxy);
+			if (x.getY() >= 1) {
+				return false;
+			}
 			return true;
 		} else {
 			x.setX(x.getX() + 1.0/maxx);

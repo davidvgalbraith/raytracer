@@ -15,7 +15,9 @@ public class Vector {
 	Vector plus(Vector a) {
 		return new Vector(x + a.getX(), y + a.getY(), z + a.getZ());
 	}
-	
+	double dot(Vector a) {
+		return x * a.getX() + y * a.getY() + z * a.getZ();
+	}
 	Vector minus(Vector a) {
 		return new Vector(x - a.getX(), y - a.getY(), z - a.getZ());
 	}
