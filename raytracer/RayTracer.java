@@ -37,6 +37,7 @@ public class RayTracer {
 		// Obtain the brdf at intersection point
 		BRDF brdf = new BRDF();
 		in.getPrimitive().getBRDF(in.getLocalGeo(), brdf);
+		System.out.println("In the ray tracer, in's local geo is " + in.getLocalGeo());
 		// There is an intersection, loop through all light source
 		for (int i = 0; i < lights.size(); i++) {
 			Ray lray = new Ray(null, null, 0, 0);
