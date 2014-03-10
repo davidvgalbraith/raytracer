@@ -11,7 +11,6 @@ public class Sphere implements Shape {
 
 	@Override
 	public boolean intersect(Ray ray, Doublet thit, LocalGeo local) {
-		//System.out.println("Does " + ray + " intersect " + this + "?");
 		Point e = ray.getPos();
 		Vector d = ray.getDir();
 		double a = d.dot(d);
@@ -42,11 +41,12 @@ public class Sphere implements Shape {
 
 	@Override
 	public boolean intersectP(Ray ray) {
+
 		Point e = ray.getPos();
 		Vector d = ray.getDir();
 		double a = d.dot(d);
 		double b = 2 * d.dot(e.minus(center));
-		double c = e.minus(center).dot(e.minus(center));
+		double c = e.minus(center).dot(e.minus(center)) - radius * radius;
 		double disc = b * b - 4 * a * c;
 		if (disc < 0) {
 			return false;

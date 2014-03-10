@@ -25,14 +25,15 @@ public class GeometricPrimitive implements Primitive {
 			return false;
 		}
 		in.setPrimitive(this);
-		System.out.println("Setting local geo to " + olocal);
 		in.setLocalGeo(olocal);//objToWorld.transform(olocal));
 		return true;
 	}
 
 	@Override
 	public boolean intersectP(Ray ray) {
+		
 		Ray oray = ray;//objToWorld.transform(ray);
+		System.out.println("BANANAS IN PAJAMAS " + oray);
 		return shape.intersectP(oray);
 	}
 

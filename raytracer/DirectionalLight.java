@@ -15,7 +15,7 @@ public class DirectionalLight implements Light {
 	public void generateLightRay(LocalGeo geo, Ray lray, Color col) {
 		lray.setPos(geo.getPos());
 		lray.setDir(direction.times(-1));
-		lray.setTmin(0);
+		lray.setTmin(0.1);
 		lray.setTmax(Double.MAX_VALUE);
 		col.setAll(color);
 	}

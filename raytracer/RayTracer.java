@@ -37,14 +37,12 @@ public class RayTracer {
 		// Obtain the brdf at intersection point
 		BRDF brdf = new BRDF();
 		in.getPrimitive().getBRDF(in.getLocalGeo(), brdf);
-		System.out.println("In the ray tracer, in's local geo is " + in.getLocalGeo());
 		// There is an intersection, loop through all light source
 		for (int i = 0; i < lights.size(); i++) {
 			Ray lray = new Ray(null, null, 0, 0);
 			Color lcolor = new Color(0, 0, 0);
 			lights.get(i).generateLightRay(in.getLocalGeo(), lray, lcolor);
 			color.setAll(color.plus(brdf.getKa().times(lcolor)));
-
 			// Check if the light is blocked or not
 			if (!p.intersectP(lray)) {
 				// If not, do shading calculation for this
@@ -52,6 +50,8 @@ public class RayTracer {
 				color.setAll(color
 						.plus(shading(in.getLocalGeo(), brdf, lray, lcolor)));
 
+			} else {
+				System.out.println("Dodged that bullet.");
 			}
 
 			// Handle mirror reflection
@@ -85,7 +85,6 @@ public class RayTracer {
 		//return diff;
 	}
 	Color speculate(LocalGeo geo, BRDF brdf, Ray lray, Color lcolor) {
-		System.out.println(geo);
 		Vector l = lray.getDir().normalize();
 		Vector n = geo.getNormal().vectorize();
 		Vector r = l.times(-1).plus(n.times(2 * n.dot(l))).normalize();
