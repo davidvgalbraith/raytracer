@@ -1,7 +1,36 @@
 package raytracer;
 
 public class Scene {
-	//scene kids only
+	// scene kids only
+	Sampler sampler;
+	Camera camera;
+	Film film;
+	RayTracer raytracer;
+
+	public Scene(Sampler sampler, Camera camera, Film film, RayTracer raytracer) {
+		this.sampler = sampler;
+		this.camera = camera;
+		this.film = film;
+		this.raytracer = raytracer;
+	}
+
+	void render() {
+		Sample sample = new Sample(1, -0.5 / 100);
+		Ray ray = new Ray(null, null, 1, 100);
+		Color color = new Color(0, 0, 0);
+		while (sampler.generateSample(sample)) {
+			System.out.println(sample);
+			camera.generateRay(sample, ray);
+
+			raytracer.trace(ray, 5, color);
+
+			film.commit(sample, color);
+
+		}
+
+		film.writeImage();
+	}
 	
 	
+
 }

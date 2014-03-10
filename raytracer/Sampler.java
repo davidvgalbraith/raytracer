@@ -9,8 +9,8 @@ public class Sampler {
 		this.maxy = maxy;
 	}
 
-	boolean getSample(Sample x) {
-		if (x.getY() > 1) {
+	boolean generateSample(Sample x) {
+		if (x.getY() >= 1) {
 			return false;
 		}
 		if (x.getX() + 1.0/maxx >= 1) {

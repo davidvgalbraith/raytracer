@@ -7,7 +7,9 @@ public class Sample {
 		this.x = x;
 		this.y = y;
 	}
-	
+	public String toString() {
+		return "Sample: (" + x + ", " + y + ")";
+	}
 	public double getX() {
 		return x;
 	}
