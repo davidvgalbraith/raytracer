@@ -37,7 +37,6 @@ public class RayTracer {
 		}
 
 		// Obtain the brdf at intersection point
-		System.out.println("It intersected!");
 		BRDF brdf = new BRDF(null, null, null, null);
 		in.getPrimitive().getBRDF(in.getLocalGeo(), brdf);
 		color.setR(1.0);

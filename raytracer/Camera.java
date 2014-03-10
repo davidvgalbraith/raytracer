@@ -24,7 +24,7 @@ public class Camera {
 		Vector pv1 = (ll.times(samp.getY()).plus(ul.times(1 - samp.getY()))).times(samp.getX());
 		Vector pv2 = (lr.times(samp.getY()).plus(ur.times(1 - samp.getY()))).times(1 - samp.getX());
 		Vector pv = pv1.plus(pv2);
-		Point p = new Point(pv.getX(), pv.getY(), -1);
+		Point p = new Point(pv.getX(), pv.getY(), -0.5);
 		ray.setDir(p.minus(eyepos));
 	}
 }
