@@ -51,7 +51,7 @@ public class RayTracer {
 						.plus(shading(in.getLocalGeo(), brdf, lray, lcolor)));
 
 			} else {
-				System.out.println("Dodged that bullet.");
+//				System.out.println("Dodged that bullet.");
 			}
 
 			// Handle mirror reflection

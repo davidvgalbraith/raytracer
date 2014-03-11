@@ -33,7 +33,7 @@ public class GeometricPrimitive implements Primitive {
 	public boolean intersectP(Ray ray) {
 		
 		Ray oray = ray;//objToWorld.transform(ray);
-		System.out.println("BANANAS IN PAJAMAS " + oray);
+		//System.out.println("BANANAS IN PAJAMAS " + oray);
 		return shape.intersectP(oray);
 	}
 

@@ -89,6 +89,19 @@ public class Main {
 				BRDF barf = new BRDF(kd, ks, ka, kr);
 				agg.add(new GeometricPrimitive(t, t, sphere, new Material(barf)));
 			}
+			if (next.startsWith("Triangle")) {
+				System.out.println(next);
+				Vector v1 = vectify(next.substring(next.indexOf('=') + 2, next.indexOf(']')));
+				Vector v2 = vectify(next.substring(next.indexOf("v2=") + 4, next.indexOf("] v3")));
+				Vector v3 = vectify(next.substring(next.indexOf("v3=")  + 4, next.length()-1));
+				Triangle tri = new Triangle(v1, v2, v3);
+				Color ka = colorfy(scan);
+				Color kd = colorfy(scan);
+				Color ks = colorfy(scan);
+				Color kr = colorfy(scan);
+				BRDF barfy = new BRDF(kd, ks, ka, kr);
+				agg.add(new GeometricPrimitive(t, t, tri, new Material(barfy)));
+			}
 		}
 		
 		Sampler s = new Sampler(xpic, ypic);
