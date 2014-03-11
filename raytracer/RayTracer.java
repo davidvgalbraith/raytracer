@@ -7,28 +7,27 @@ public class RayTracer {
 	AggregatePrimitive p;
 	List<Light> lights;
 	Point origin;
-
+	int maxDepth;
+	
 	public RayTracer() {
 		this.p = new AggregatePrimitive(new ArrayList<Primitive>());
 		this.lights = new ArrayList<Light>();
 	}
 
-	public RayTracer(AggregatePrimitive p, List<Light> lights, Point origin) {
+	public RayTracer(AggregatePrimitive p, List<Light> lights, Point origin, int maxDepth) {
 		this.p = p;
 		this.lights = lights;
 		this.origin = origin;
+		this.maxDepth = maxDepth;
 	}
 
 	void trace(Ray ray, int depth, Color color) {
 
 		Doublet d = new Doublet(0);
 
-		if (depth > 0) {
-			// d.setD(69);
-		}
 		origin = ray.getPos();
 		Intersection in = new Intersection(null, null);
-		if (depth > 1) {
+		if (depth > maxDepth) {
 			color.setB(0.0);
 			color.setG(0.0);
 			color.setR(0.0);
@@ -54,9 +53,12 @@ public class RayTracer {
 			Ray lray = new Ray(null, null, 0, 0);
 			Color lcolor = new Color(0, 0, 0);
 			lights.get(i).generateLightRay(in.getLocalGeo(), lray, lcolor);
-			color.setAll(color.plus(brdf.getKa().times(lcolor)));
 			// Check if the light is blocked or not
+			if (depth == 0) {
+				color.setAll(color.plus(brdf.getKa().times(lcolor)));
+			}
 			if (!p.intersectP(lray)) {
+
 				// If not, do shading calculation for this
 				// light source
 				// System.out.println("Hilarious! " + in.getLocalGeo() + " " +
@@ -76,7 +78,7 @@ public class RayTracer {
 			Color temp = new Color(0, 0, 0);
 			// System.out.println("Yes this is dog" + depth);
 			trace(reflectRay, depth + 1, temp);
-			System.out.println(color + " Not now dog); " + temp);
+//			System.out.println(color + " Not now dog); " + temp);
 			color.setAll(color.plus(temp.times(brdf.getKr())));
 
 		}

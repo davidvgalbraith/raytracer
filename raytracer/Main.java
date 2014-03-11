@@ -105,14 +105,14 @@ public class Main {
 		}
 		
 		Sampler s = new Sampler(xpic, ypic);
-		Film f = new Film(xpic, ypic);
+		Film f = new Film(xpic, ypic, args[1]);
 		Camera c = new Camera(eyepos, ul, ur, ll, lr);
 		System.out.println(c);
 		for (Light l : lights) {
 			System.out.println(l);
 		}
 		System.out.println(agg);
-		RayTracer r = new RayTracer(agg, lights, eyepos);
+		RayTracer r = new RayTracer(agg, lights, eyepos, 5);
 		Scene scene = new Scene(s, c, f, r);
 		scene.render();
 		System.out.println("Whew.");

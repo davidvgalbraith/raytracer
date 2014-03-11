@@ -5,8 +5,11 @@ import java.io.IOException;
 
 public class Film {
 	int[][] picture;
-	public Film(int width, int height) {
+	String name;
+	
+	public Film(int width, int height, String name) {
 		picture = new int[height][width];
+		this.name = name;
 	}
 	void commit(Sample samp, Color c) {
 		int col = (int) (samp.getX() * picture[0].length);
@@ -20,7 +23,7 @@ public class Film {
 		
 		BufferedImage image = ImageExport.convertRGBImageWithHeader(picture,"Iteration: 1");
 		try {
-			ImageExport.exportImageToFile("test2.jpg",image);
+			ImageExport.exportImageToFile(name,image);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
