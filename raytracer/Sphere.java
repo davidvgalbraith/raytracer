@@ -66,4 +66,7 @@ public class Sphere implements Shape {
 	public String toString() {
 		return "a sphere of radius " + radius + " centered at " + center;
 	}
+	public boolean isTriangle() {
+		return false;
+	}
 }

@@ -29,7 +29,9 @@ public class Color {
 		this.g = g;
 		this.b = b;
 	}
-
+	public Color toThe(double fifty) {
+		return new Color(Math.pow(r, fifty), Math.pow(g, fifty), Math.pow(b, fifty));
+	}
 	public Color() {
 		this.r = 0;
 		this.g = 0;

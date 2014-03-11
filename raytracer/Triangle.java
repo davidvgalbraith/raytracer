@@ -81,5 +81,7 @@ public class Triangle implements Shape {
 	public String toString() {
 		return "Triangle: " + va + " " + vb + " " + vc;
 	}
-	
+	public boolean isTriangle() {
+		return true;
+	}
 }

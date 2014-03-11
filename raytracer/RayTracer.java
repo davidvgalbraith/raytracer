@@ -7,11 +7,12 @@ public class RayTracer {
 	AggregatePrimitive p;
 	List<Light> lights;
 	Point origin;
+
 	public RayTracer() {
 		this.p = new AggregatePrimitive(new ArrayList<Primitive>());
 		this.lights = new ArrayList<Light>();
 	}
-	
+
 	public RayTracer(AggregatePrimitive p, List<Light> lights, Point origin) {
 		this.p = p;
 		this.lights = lights;
@@ -19,15 +20,15 @@ public class RayTracer {
 	}
 
 	void trace(Ray ray, int depth, Color color) {
-		
+
 		Doublet d = new Doublet(0);
 
 		if (depth > 0) {
-			d.setD(69);
+			// d.setD(69);
 		}
-		//origin = ray.getPos();
+		origin = ray.getPos();
 		Intersection in = new Intersection(null, null);
-		if (depth > 5) {
+		if (depth > 1) {
 			color.setB(0.0);
 			color.setG(0.0);
 			color.setR(0.0);
@@ -41,9 +42,10 @@ public class RayTracer {
 			return;
 		}
 		// Obtain the brdf at intersection point
-		if (depth > 0) {
-			System.out.println("I run squad battle." + d.getD());
-			//System.exit(1);
+		if (depth > 0
+				&& ((GeometricPrimitive) in.getPrimitive()).shape.isTriangle()) {
+			System.err.println("Self intersection" + d.getD());
+			System.exit(1);
 		}
 		BRDF brdf = new BRDF();
 		in.getPrimitive().getBRDF(in.getLocalGeo(), brdf);
@@ -57,73 +59,71 @@ public class RayTracer {
 			if (!p.intersectP(lray)) {
 				// If not, do shading calculation for this
 				// light source
-//				System.out.println("Hilarious! " + in.getLocalGeo() + " " + brdf + " " + lray + " " + lcolor);
-				color.setAll(color
-						.plus(shading(in.getLocalGeo(), brdf, lray, lcolor)));
+				// System.out.println("Hilarious! " + in.getLocalGeo() + " " +
+				// brdf + " " + lray + " " + lcolor);
+				color.setAll(color.plus(shading(in.getLocalGeo(), brdf, lray,
+						lcolor)));
 
-			} else {
-				///System.out.println("Dodged that bullet.");
+				// Handle mirror reflection
 			}
+		}
+		if (brdf.getKr().getB() > 0 || brdf.getKr().getG() > 0
+				|| brdf.getKr().getR() > 0) {
+			// System.out.println("ray was " + ray);
+			Ray reflectRay = createReflectRay(in.getLocalGeo(), ray);
+			// System.out.println("Ray is " + ray);
+			// Make a recursive call to trace the reflected ray
+			Color temp = new Color(0, 0, 0);
+			// System.out.println("Yes this is dog" + depth);
+			trace(reflectRay, depth + 1, temp);
+			System.out.println(color + " Not now dog); " + temp);
+			color.setAll(color.plus(temp.times(brdf.getKr())));
 
-			// Handle mirror reflection
-
-			if (brdf.getKr().getB() > 0 || brdf.getKr().getG() > 0 || brdf.getKr().getR() > 0) {
-				//System.out.println("ray was " + ray);
-				Ray reflectRay = createReflectRay(in.getLocalGeo(), ray);
-				//System.out.println("Ray is " + ray);
-				// Make a recursive call to trace the reflected ray
-				Color temp = new Color(0, 0, 0);
-				//System.out.println("Yes this is dog" + depth);
-				trace(reflectRay, depth + 1, temp);
-				System.out.println("Not now dog); " + temp);
-				color.setAll(color.plus(temp.times(brdf.getKr())));
-			}
 		}
 	}
 
 	Ray createReflectRay(LocalGeo geo, Ray ray) {
-		//System.out.println(ray);
-		//System.out.println(geo);
-		
 		Vector l = ray.getDir().normalize();
 		Vector n = geo.getNormal().vectorize();
-		Vector r = (l.times(-1).plus(n.times(2 * n.dot(l))).normalize()).times(-1);
+		Vector r = (l.times(-1).plus(n.times(2 * n.dot(l))).normalize())
+				.times(-1);
 		Ray rey = new Ray(geo.getPos(), r, 0.01, Double.MAX_VALUE);
-		//System.out.println("Retard is " + rey);
 		return rey;
-		//return new Ray(geo.getPos(), r, 0.1, Double.MAX_VALUE);
 	}
 
 	Color shading(LocalGeo geo, BRDF brdf, Ray lray, Color lcolor) {
 		Color spec = speculate(geo, brdf, lray, lcolor);
 		Color diff = diffuse(geo, brdf, lray, lcolor);
-//		System.out.println("Spec: " + spec);
-//		System.out.println("Diff: " + diff);
+		// System.out.println("Diff: " + diff);
 		return spec.plus(diff);
-//		return spec;
-		//return diff;
+		// return spec;
+		// return diff;
 	}
+
 	Color speculate(LocalGeo geo, BRDF brdf, Ray lray, Color lcolor) {
 		Vector l = lray.getDir().normalize();
 		Vector n = geo.getNormal().vectorize();
 		Vector r = l.times(-1).plus(n.times(2 * n.dot(l))).normalize();
 		Vector v = origin.minus(geo.getPos()).normalize();
-//		System.out.println("Noraml was " + geo.getNormal() + " and  pointlnnelsly calculated " + v);
+		// System.out.println("Noraml was " + geo.getNormal() +
+		// " and  pointlnnelsly calculated " + v);
 		double dot = r.dot(v);
 		if (dot < 0) {
 			dot = 0;
 		} else {
 			dot = Math.pow(dot, 50);
 		}
-//		System.out.println("Dof " + dot);
+		// System.out.println("Dof " + dot);
 		return colorific(dot, brdf.getKs(), lcolor);
 	}
+
 	Color diffuse(LocalGeo geo, BRDF brdf, Ray lray, Color lcolor) {
 		Vector l = lray.getDir().normalize();
 		Vector n = geo.getNormal().vectorize();
 		double dot = n.dot(l);
 		return colorific(dot, brdf.getKd(), lcolor);
 	}
+
 	Color colorific(double dot, Color k, Color lcolor) {
 		double red = Math.max(dot * k.getR() * lcolor.getR(), 0);
 		double green = Math.max(dot * k.getG() * lcolor.getG(), 0);
