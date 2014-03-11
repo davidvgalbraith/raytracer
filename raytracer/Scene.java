@@ -16,7 +16,7 @@ public class Scene {
 
 	void render() {
 		Sample sample = new Sample(1, -0.5 / sampler.maxy);
-		Ray ray = new Ray(null, null, 1, 1000000000);
+		Ray ray = new Ray(null, null, 0, Double.MAX_VALUE);
 		while (sampler.generateSample(sample)) {
 			Color color = new Color(0, 0, 0);
 

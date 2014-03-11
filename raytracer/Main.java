@@ -112,7 +112,7 @@ public class Main {
 			System.out.println(l);
 		}
 		System.out.println(agg);
-		RayTracer r = new RayTracer(agg, lights);
+		RayTracer r = new RayTracer(agg, lights, eyepos);
 		Scene scene = new Scene(s, c, f, r);
 		scene.render();
 		System.out.println("Whew.");

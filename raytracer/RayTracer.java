@@ -12,14 +12,20 @@ public class RayTracer {
 		this.lights = new ArrayList<Light>();
 	}
 	
-	public RayTracer(AggregatePrimitive p, List<Light> lights) {
+	public RayTracer(AggregatePrimitive p, List<Light> lights, Point origin) {
 		this.p = p;
 		this.lights = lights;
+		this.origin = origin;
 	}
 
 	void trace(Ray ray, int depth, Color color) {
+		
 		Doublet d = new Doublet(0);
-		origin = ray.getPos();
+
+		if (depth > 0) {
+			d.setD(69);
+		}
+		//origin = ray.getPos();
 		Intersection in = new Intersection(null, null);
 		if (depth > 5) {
 			color.setB(0.0);
@@ -35,6 +41,10 @@ public class RayTracer {
 			return;
 		}
 		// Obtain the brdf at intersection point
+		if (depth > 0) {
+			System.out.println("I run squad battle." + d.getD());
+			//System.exit(1);
+		}
 		BRDF brdf = new BRDF();
 		in.getPrimitive().getBRDF(in.getLocalGeo(), brdf);
 		// There is an intersection, loop through all light source
@@ -47,32 +57,41 @@ public class RayTracer {
 			if (!p.intersectP(lray)) {
 				// If not, do shading calculation for this
 				// light source
+//				System.out.println("Hilarious! " + in.getLocalGeo() + " " + brdf + " " + lray + " " + lcolor);
 				color.setAll(color
 						.plus(shading(in.getLocalGeo(), brdf, lray, lcolor)));
 
 			} else {
-//				System.out.println("Dodged that bullet.");
+				///System.out.println("Dodged that bullet.");
 			}
 
 			// Handle mirror reflection
 
 			if (brdf.getKr().getB() > 0 || brdf.getKr().getG() > 0 || brdf.getKr().getR() > 0) {
-				System.err.println("FUCK reflection");
-				System.exit(1);
+				//System.out.println("ray was " + ray);
 				Ray reflectRay = createReflectRay(in.getLocalGeo(), ray);
-
+				//System.out.println("Ray is " + ray);
 				// Make a recursive call to trace the reflected ray
 				Color temp = new Color(0, 0, 0);
+				//System.out.println("Yes this is dog" + depth);
 				trace(reflectRay, depth + 1, temp);
-
+				System.out.println("Not now dog); " + temp);
 				color.setAll(color.plus(temp.times(brdf.getKr())));
-
 			}
 		}
 	}
 
 	Ray createReflectRay(LocalGeo geo, Ray ray) {
-		return null;
+		//System.out.println(ray);
+		//System.out.println(geo);
+		
+		Vector l = ray.getDir().normalize();
+		Vector n = geo.getNormal().vectorize();
+		Vector r = (l.times(-1).plus(n.times(2 * n.dot(l))).normalize()).times(-1);
+		Ray rey = new Ray(geo.getPos(), r, 0.01, Double.MAX_VALUE);
+		//System.out.println("Retard is " + rey);
+		return rey;
+		//return new Ray(geo.getPos(), r, 0.1, Double.MAX_VALUE);
 	}
 
 	Color shading(LocalGeo geo, BRDF brdf, Ray lray, Color lcolor) {

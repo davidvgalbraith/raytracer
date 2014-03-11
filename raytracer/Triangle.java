@@ -33,8 +33,8 @@ public class Triangle implements Shape {
 		}
 		thit.setD(t);
 		local.setPos(ray.eval(t));
-		Vector norm = ((vb.minus(va)).cross((vc.minus(va)))).normalize();
-		local.setNormal(new Normal(norm.getX(), norm.getY(), norm.getZ()));
+		Vector norm1 = ((vb.minus(va)).cross((vc.minus(va)))).normalize();
+		local.setNormal(new Normal(norm1.getX(), norm1.getY(), norm1.getZ()));
 		return true;
 		
 	}
