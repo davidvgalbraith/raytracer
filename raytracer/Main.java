@@ -3,12 +3,14 @@ package raytracer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main {
 
 	public static void main(String[] args) {
 		System.out.println("Okay, let's roll.");
+		String read = readOBJ(args[0]);
 		Scanner scan = null;
 		Point eyepos = new Point(0, 0, 0);
 		int xpic = 100;
@@ -124,9 +126,6 @@ public class Main {
 						MatrixMathematics.inverse(m));
 				System.out.println("m\n" + m);
 				System.out.println("Minverse\n" + MatrixMathematics.inverse(m));
-				System.out.println("Produck \n"
-						+ MatrixMathematics.multiply(m,
-								MatrixMathematics.inverse(m)));
 				Color ka = colorfy(scan);
 				Color kd = colorfy(scan);
 				Color ks = colorfy(scan);
@@ -200,6 +199,14 @@ public class Main {
 		return colorfy(q);
 	}
 
+	static Normal normalfy(String s) {
+		Scanner q = new Scanner(s);
+		double x = Double.parseDouble(q.next());
+		double y = Double.parseDouble(q.next());
+		double z = Double.parseDouble(q.next());
+		return new Normal(x, y, z);
+	}
+
 	static Matrix rottify(Scanner s) {
 		String t = s.nextLine().trim();
 		return rottify(t);
@@ -216,7 +223,7 @@ public class Main {
 		}
 		Matrix id = MatrixMathematics.identity(4);
 		for (Matrix m : mats) {
-			id = MatrixMathematics.multiply(id, m);
+			id = MatrixMathematics.multiply(m, id);
 		}
 		return id;
 	}
@@ -224,19 +231,108 @@ public class Main {
 	// Rotation matrix of angle theta about axis axis
 	static Matrix rotation(int axis, double theta) {
 		Matrix ret = MatrixMathematics.identity(4);
+		if (axis == 0) {
+			ret.setValueAt(1, 1, Math.cos(theta));
+			ret.setValueAt(1, 2, -Math.sin(theta));
+			ret.setValueAt(2, 1, Math.sin(theta));
+			ret.setValueAt(2, 2, Math.cos(theta));
+		}
 		if (axis == 1) {
 			ret.setValueAt(0, 0, Math.cos(theta));
 			ret.setValueAt(0, 2, -Math.sin(theta));
 			ret.setValueAt(2, 0, Math.sin(theta));
 			ret.setValueAt(2, 2, Math.cos(theta));
-		} else {
-			int k = (axis + 1) % 3;
-			ret.setValueAt(k, k, Math.cos(theta));
-			ret.setValueAt(k, k+1, -Math.sin(theta));
-			ret.setValueAt(k+1, k, Math.sin(theta));
-			ret.setValueAt(k+1, k+1, Math.cos(theta));
 		}
-		System.out.println(theta + " degrees about " + axis + " is \n" + ret);
+		if (axis == 2) {
+			ret.setValueAt(0, 0, Math.cos(theta));
+			ret.setValueAt(0, 1, -Math.sin(theta));
+			ret.setValueAt(1, 0, Math.sin(theta));
+			ret.setValueAt(1, 1, Math.cos(theta));
+		}
+		System.out.println(Math.toDegrees(theta) + " degrees about " + axis
+				+ " is \n" + ret);
 		return ret;
 	}
+
+	static String readOBJ(String x) {
+		Scanner s = null;
+		HashMap<Integer, Point> vertexes = new HashMap<Integer, Point>();
+		HashMap<Integer, Normal> normals = new HashMap<Integer, Normal>();
+		int vector = 1;
+		int normal = 1;
+		String ret = "";
+		try {
+			s = new Scanner(new File(x));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		while (s.hasNext()) {
+			String next = s.next();
+			if (next.startsWith("v ")) {
+				vertexes.put(vector, pointify(next.substring(1)));
+				vector += 1;
+				continue;
+			}
+			if (next.startsWith("vn ")) {
+				normals.put(normal, normalfy(next.substring(2)));
+			}
+			if (next.startsWith("f ")) {
+				Scanner k = new Scanner(next);
+				String first = k.next();
+				Point v1;
+				Normal n1 = null;
+				if (first.contains("//")) {
+					v1 = vertexes.get(Integer.parseInt(first.substring(0,
+							first.indexOf("/"))));
+					n1 = normals.get(Integer.parseInt(first.substring(first
+							.indexOf("//") + 2)));
+				} else {
+					v1 = vertexes.get(Integer.parseInt(first));
+				}
+				String second = k.next();
+				Point v2;
+				Normal n2 = null;
+				if (second.contains("//")) {
+					v2 = vertexes.get(Integer.parseInt(second.substring(0,
+							second.indexOf("/"))));
+					n2 = normals.get(Integer.parseInt(second.substring(second
+							.indexOf("//") + 2)));
+				} else {
+					v2 = vertexes.get(Integer.parseInt(second));
+				}
+				String third = k.next();
+				Point v3;
+				Normal n3 = null;
+				if (third.contains("//")) {
+					v3 = vertexes.get(Integer.parseInt(third.substring(0,
+							third.indexOf("/"))));
+					n3 = normals.get(Integer.parseInt(third.substring(third
+							.indexOf("//") + 2)));
+				} else {
+					v3 = vertexes.get(Integer.parseInt(third));
+				}
+				if (n1 != null) {
+					ret += "Triangle with v1=" + stringate(v1) + " v2="
+							+ stringate(v2) + " v3=" + stringate(v3) + "\n"
+							+ brdf() + "n1=" + stringate(n1) + " n2=" + stringate(n2) + " n3=" + stringate(n3);
+				} else {
+					ret += "Triangle with v1=" + stringate(v1) + " v2="
+							+ stringate(v2) + " v3=" + stringate(v3) + "\n"
+							+ brdf();
+				}
+			}
+		}
+		return ret;
+	}
+
+	static String stringate(Point p) {
+		return "[ " + p.getX() + "  " + p.getY() + "  " + p.getZ() + " ]";
+	}
+	static String stringate(Normal p) {
+		return "[ " + p.getX() + "  " + p.getY() + "  " + p.getZ() + " ]";
+	}
+	static String brdf() {
+		return "ka=[ 0.1  0.1  0.1]\nkd=[ 0.  1.  1.]\nks=[ 1.  1.  1.]\nkr=[ 0.  0.  0.]\n";
+	}
+	finish parsing obj files, figure out vertex normals
 }

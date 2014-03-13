@@ -26,7 +26,7 @@ public class Matrix {
 		String s = "";
 		for (double[] dd : data) {
 			for (double d : dd) {
-				s += d + " ";
+				s += (Math.floor(d*100)/100.0) + " ";
 			}
 			s += "\n";
 		}
