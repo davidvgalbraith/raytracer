@@ -22,6 +22,17 @@ public class Matrix {
 		data = new double[nrow][ncol];
 	}
 
+	public String toString() {
+		String s = "";
+		for (double[] dd : data) {
+			for (double d : dd) {
+				s += d + " ";
+			}
+			s += "\n";
+		}
+		return s;
+	}
+	
 	public int getNrows() {
 		return nrows;
 	}
@@ -85,5 +96,17 @@ public class Matrix {
 			}
 		}
 		return X_;
+	}
+	public double[] times(double[] vec) {
+		double[] res = new double[nrows];
+		if (ncols != vec.length) {
+			System.err.println("Invalid matrix-vector produck: " + ncols + " cols and " + vec.length + " vector length");
+		}
+		for (int a = 0; a < nrows; a++) {
+			for (int b = 0; b < vec.length; b++) {
+				res[a] += data[a][b] * vec[b];
+			}
+		}
+		return res;
 	}
 }

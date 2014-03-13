@@ -48,8 +48,8 @@ public class Vector {
 		double norm = Math.sqrt(x * x + y * y + z * z);
 		if (norm == 0) {
 			System.err.println("Divided by zero in " + this + ".normalize()");
-			Integer k = null;
-			k.doubleValue();
+//			Integer k = null;
+//			k.doubleValue();
 			System.exit(10);
 		}
 

@@ -22,7 +22,9 @@ public class RayTracer {
 	}
 
 	void trace(Ray ray, int depth, Color color) {
-
+		if (depth > 0) {
+			System.out.println("KATNISS ABERDEEN " + ray);
+		}
 		Doublet d = new Doublet(0);
 
 		origin = ray.getPos();
@@ -41,11 +43,6 @@ public class RayTracer {
 			return;
 		}
 		// Obtain the brdf at intersection point
-		if (depth > 0
-				&& ((GeometricPrimitive) in.getPrimitive()).shape.isTriangle()) {
-			System.err.println("Self intersection" + d.getD());
-			System.exit(1);
-		}
 		BRDF brdf = new BRDF();
 		in.getPrimitive().getBRDF(in.getLocalGeo(), brdf);
 		// There is an intersection, loop through all light source

@@ -2,91 +2,52 @@ package raytracer;
 
 public class Transformation {
 	Matrix m, minvt;
+
 	public Transformation(Matrix m) {
 		this.m = m;
-		try {
-			this.minvt = MatrixMathematics.transpose(MatrixMathematics.inverse(m));
-		} catch (NoSquareException e) {
-			e.printStackTrace();
-		}
+			this.minvt = MatrixMathematics.transpose(MatrixMathematics
+					.inverse(m));
 	}
+
 	Point transform(Point a) {
-		double x = 0;
-		double y = 0;
-		double z = 0;
-		x += m.getValues()[0][0] * a.getX();
-		x += m.getValues()[0][1] * a.getY();
-		x += m.getValues()[0][2] * a.getZ();
-		y += m.getValues()[1][0] * a.getX();
-		y += m.getValues()[1][1] * a.getY();
-		y += m.getValues()[1][2] * a.getZ();
-		z += m.getValues()[2][0] * a.getX();
-		z += m.getValues()[2][1] * a.getY();
-		z += m.getValues()[2][2] * a.getZ();
-		return new Point(x, y, z);
+		double[] toarr = new double[4];
+		toarr[0] = a.getX();
+		toarr[1] = a.getY();
+		toarr[2] = a.getZ();
+		toarr[3] = 1;
+		double[] x = m.times(toarr);
+		return new Point(x[0], x[1], x[2]);
 	}
 
 	Ray transform(Ray a) {
-		double x = 0;
-		double y = 0;
-		double z = 0;
-		x += m.getValues()[0][0] * a.getX();
-		x += m.getValues()[0][1] * a.getY();
-		x += m.getValues()[0][2] * a.getZ();
-		y += m.getValues()[1][0] * a.getX();
-		y += m.getValues()[1][1] * a.getY();
-		y += m.getValues()[1][2] * a.getZ();
-		z += m.getValues()[2][0] * a.getX();
-		z += m.getValues()[2][1] * a.getY();
-		z += m.getValues()[2][2] * a.getZ();
-		return new Ray(new Point(x, y, z), transform(a.getDir()), a.getTmin(),
-				a.getTmax());
+		return new Ray(transform(a.getPos()), transform(a.getDir()),//transform(a.getDir()).minus(transform(a.getPos().toVect())),
+				a.getTmin(), a.getTmax());
 	}
 
 	Vector transform(Vector a) {
-		double x = 0;
-		double y = 0;
-		double z = 0;
-		x += m.getValues()[0][0] * a.getX();
-		x += m.getValues()[0][1] * a.getY();
-		x += m.getValues()[0][2] * a.getZ();
-		y += m.getValues()[1][0] * a.getX();
-		y += m.getValues()[1][1] * a.getY();
-		y += m.getValues()[1][2] * a.getZ();
-		z += m.getValues()[2][0] * a.getX();
-		z += m.getValues()[2][1] * a.getY();
-		z += m.getValues()[2][2] * a.getZ();
-		return new Vector(x, y, z);
+		double[] toarr = new double[4];
+		toarr[0] = a.getX();
+		toarr[1] = a.getY();
+		toarr[2] = a.getZ();
+		toarr[3] = 0;
+		double[] x = m.times(toarr);
+		return new Vector(x[0], x[1], x[2]);
 	}
 
 	LocalGeo transform(LocalGeo a) {
-		double x = 0;
-		double y = 0;
-		double z = 0;
-		x += m.getValues()[0][0] * a.getX();
-		x += m.getValues()[0][1] * a.getY();
-		x += m.getValues()[0][2] * a.getZ();
-		y += m.getValues()[1][0] * a.getX();
-		y += m.getValues()[1][1] * a.getY();
-		y += m.getValues()[1][2] * a.getZ();
-		z += m.getValues()[2][0] * a.getX();
-		z += m.getValues()[2][1] * a.getY();
-		z += m.getValues()[2][2] * a.getZ();
-		return new LocalGeo(new Point(x, y, z), transform(a.getNormal()));
+		return new LocalGeo(transform(a.getPos()), transform(a.getNormal()));
 	}
+
 	Normal transform(Normal a) {
-		double x = 0;
-		double y = 0;
-		double z = 0;
-		x += minvt.getValues()[0][0] * a.getX();
-		x += minvt.getValues()[0][1] * a.getY();
-		x += minvt.getValues()[0][2] * a.getZ();
-		y += minvt.getValues()[1][0] * a.getX();
-		y += minvt.getValues()[1][1] * a.getY();
-		y += minvt.getValues()[1][2] * a.getZ();
-		z += minvt.getValues()[2][0] * a.getX();
-		z += minvt.getValues()[2][1] * a.getY();
-		z += minvt.getValues()[2][2] * a.getZ();
-		return new Normal(x, y, z);
+		double[] toarr = new double[4];
+		toarr[0] = a.getX();
+		toarr[1] = a.getY();
+		toarr[2] = a.getZ();
+		toarr[3] = 0;
+		double[] x = MatrixMathematics.transpose(m).times(toarr);
+		System.out.println("Prevnorm = " + a);
+		Normal b = new Normal(x[0], x[1], x[2]);
+		System.out.println("New normal " + b);
+		return new Normal(x[0], x[1], x[2]);
 	}
 }

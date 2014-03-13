@@ -17,24 +17,7 @@ public class Main {
 		Vector ur = new Vector(1, 1, -1);
 		Vector lr = new Vector(1, -1, -1);
 		Vector ll = new Vector(-1, -1, -1);
-		double[][] id = new double[4][4];
-		id[0][0] = 1;
-		id[0][1] = 0;
-		id[0][2] = 0;
-		id[0][3] = 0;
-		id[1][0] = 0;
-		id[1][1] = 1;
-		id[1][2] = 0;
-		id[1][3] = 0;
-		id[2][0] = 0;
-		id[2][1] = 0;
-		id[2][2] = 1;
-		id[2][3] = 0;
-		id[3][0] = 0;
-		id[3][1] = 0;
-		id[3][2] = 0;
-		id[3][3] = 1;
-		Matrix idenity = new Matrix(id);
+		Matrix idenity = MatrixMathematics.identity(4);
 		Transformation t = new Transformation(idenity);
 		AggregatePrimitive agg = new AggregatePrimitive();
 		ArrayList<Light> lights = new ArrayList<Light>();
@@ -73,27 +56,50 @@ public class Main {
 						.substring(5, next.indexOf(',') - 2))));
 			}
 			if (next.startsWith("pixelsX")) {
-				xpic = Integer.parseInt(next.substring(next.indexOf('=') + 1, next.length()));
-			}	
+				xpic = Integer.parseInt(next.substring(next.indexOf('=') + 1,
+						next.length()));
+			}
 			if (next.startsWith("pixelsY")) {
-				ypic = Integer.parseInt(next.substring(next.indexOf('=') + 1, next.length()));
+				ypic = Integer.parseInt(next.substring(next.indexOf('=') + 1,
+						next.length()));
 			}
 			if (next.startsWith("Sphere")) {
-				Point center = pointify(next.substring(next.indexOf('=') + 2, next.indexOf(']')));
-				double radius = Double.parseDouble(next.substring(next.indexOf("radius=")+7, next.length()));
-				Sphere sphere = new Sphere(center, radius);
+				Point center = pointify(next.substring(next.indexOf('=') + 2,
+						next.indexOf(']')));
+				double radius = Double.parseDouble(next.substring(
+						next.indexOf("radius=") + 7, next.length()));
+				Sphere unit = new Sphere(new Point(0, 0, 0), 1);
+				Matrix scale = MatrixMathematics.identity(4)
+						.multiplyByConstant(radius);
+				scale.setValueAt(3, 3, 1.0);
+				Matrix translate = MatrixMathematics.identity(4);
+				translate.setValueAt(0, 3, center.getX());
+				translate.setValueAt(1, 3, center.getY());
+				translate.setValueAt(2, 3, center.getZ());
+				Matrix m = MatrixMathematics.multiply(translate, scale);
+				System.out.println("m\n" + m);
+				System.out.println("Minverse\n" + MatrixMathematics.inverse(m));
+				System.out.println("Produck \n" + MatrixMathematics.multiply(m, MatrixMathematics.inverse(m)));
+				Transformation objToWorld = new Transformation(m);
+				Transformation worldToObj = new Transformation(
+						MatrixMathematics.inverse(m));
+
 				Color ka = colorfy(scan);
 				Color kd = colorfy(scan);
 				Color ks = colorfy(scan);
 				Color kr = colorfy(scan);
 				BRDF barf = new BRDF(kd, ks, ka, kr);
-				agg.add(new GeometricPrimitive(t, t, sphere, new Material(barf)));
+				agg.add(new GeometricPrimitive(objToWorld, worldToObj, unit,
+						new Material(barf)));
 			}
 			if (next.startsWith("Triangle")) {
 				System.out.println(next);
-				Vector v1 = vectify(next.substring(next.indexOf('=') + 2, next.indexOf(']')));
-				Vector v2 = vectify(next.substring(next.indexOf("v2=") + 4, next.indexOf("] v3")));
-				Vector v3 = vectify(next.substring(next.indexOf("v3=")  + 4, next.length()-1));
+				Vector v1 = vectify(next.substring(next.indexOf('=') + 2,
+						next.indexOf(']')));
+				Vector v2 = vectify(next.substring(next.indexOf("v2=") + 4,
+						next.indexOf("] v3")));
+				Vector v3 = vectify(next.substring(next.indexOf("v3=") + 4,
+						next.length() - 1));
 				Triangle tri = new Triangle(v1, v2, v3);
 				Color ka = colorfy(scan);
 				Color kd = colorfy(scan);
@@ -103,7 +109,7 @@ public class Main {
 				agg.add(new GeometricPrimitive(t, t, tri, new Material(barfy)));
 			}
 		}
-		
+
 		Sampler s = new Sampler(xpic, ypic);
 		Film f = new Film(xpic, ypic, args[1]);
 		Camera c = new Camera(eyepos, ul, ur, ll, lr);
@@ -141,7 +147,7 @@ public class Main {
 		double z = Double.parseDouble(q.next());
 		return new Color(x, y, z);
 	}
-	
+
 	static Color colorfy(Scanner s) {
 		String t = s.nextLine().trim();
 		String q = t.substring(5, t.length() - 1);

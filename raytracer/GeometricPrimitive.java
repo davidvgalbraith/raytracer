@@ -19,21 +19,23 @@ public class GeometricPrimitive implements Primitive {
 	
 	@Override
 	public boolean intersect(Ray ray, Doublet thit, Intersection in) {
-		Ray oray = ray;//objToWorld.transform(ray);
+//		System.out.println("Original " + ray);
+//		System.out.println(worldToObj.m);
+		Ray oray = worldToObj.transform(ray);
+		//System.out.println("Then " + oray);
 		LocalGeo olocal = new LocalGeo();
 		if (!shape.intersect(oray, thit, olocal)) {
 			return false;
 		}
 		in.setPrimitive(this);
-		in.setLocalGeo(olocal);//objToWorld.transform(olocal));
+		in.setLocalGeo(objToWorld.transform(olocal));
 		return true;
 	}
 
 	@Override
 	public boolean intersectP(Ray ray) {
 		
-		Ray oray = ray;//objToWorld.transform(ray);
-		//System.out.println("BANANAS IN PAJAMAS " + oray);
+		Ray oray = worldToObj.transform(ray);
 		return shape.intersectP(oray);
 	}
 
