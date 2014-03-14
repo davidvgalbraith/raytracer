@@ -91,12 +91,18 @@ public class RayTracer {
 		Vector n = geo.getNormal().vectorize();
 		Vector r = l.times(-1).plus(n.times(2 * n.dot(l))).normalize();
 		Vector v = origin.minus(geo.getPos()).normalize();
+		System.out.println("L: " + l + "\nN " + n + "\nR " + r + "\nV " + v);
 		double dot = r.dot(v);
+		System.out.println(dot);
+
 		if (dot < 0) {
 			dot = 0;
 		} else {
 			dot = Math.pow(dot, 50);
 		}
+		Color s = colorific(dot, brdf.getKs(), lcolor);
+		System.out.println(s);
+		System.out.println();
 		return colorific(dot, brdf.getKs(), lcolor);
 	}
 

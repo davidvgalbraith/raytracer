@@ -148,11 +148,11 @@ public class Main {
 			}
 
 			if (next.startsWith("Triangle")) {
-				Vector v1 = vectify(next.substring(next.indexOf('=') + 2,
+				Vector v1 = badVectify(next.substring(next.indexOf('=') + 2,
 						next.indexOf(']')));
-				Vector v2 = vectify(next.substring(next.indexOf("v2=") + 4,
+				Vector v2 = badVectify(next.substring(next.indexOf("v2=") + 4,
 						next.indexOf("] v3")));
-				Vector v3 = vectify(next.substring(next.indexOf("v3=") + 4,
+				Vector v3 = badVectify(next.substring(next.indexOf("v3=") + 4,
 						next.length() - 1));
 				Triangle tri = new Triangle(v1, v2, v3);
 				Color ka = colorfy(scan);
@@ -189,12 +189,12 @@ public class Main {
 		Sampler s = new Sampler(xpic, ypic);
 		Film f = new Film(xpic, ypic, args[obj]);
 		Camera c = new Camera(eyepos, ul, ur, ll, lr);
-		System.out.println(c);
-		System.out.println("Lights");
-		for (Light l : lights) {
-			System.out.println(l);
-		}
-		System.out.println(agg);
+//		System.out.println(c);
+//		System.out.println("Lights");
+//		for (Light l : lights) {
+//			System.out.println(l);
+//		}
+//		System.out.println(agg);
 		RayTracer r = new RayTracer(agg, lights, eyepos, 5);
 		Scene scene = new Scene(s, c, f, r);
 		scene.render();
@@ -223,7 +223,7 @@ public class Main {
 		double x = Double.parseDouble(q.next());
 		double y = Double.parseDouble(q.next());
 		double z = Double.parseDouble(q.next());
-		return new Vector(x, y, z - 8);
+		return new Vector(x, y, z - 5);
 	}
 
 	static Color colorfy(String s) {
