@@ -1,0 +1,1 @@
+This image demonstrates a shaded sphere with two directional light sources. It was created by java raytracer.Main input-00.txt image-00.jpg in about a second.

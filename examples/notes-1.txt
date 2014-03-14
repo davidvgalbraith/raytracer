@@ -1,0 +1,1 @@
+This image demonstrates a shaded sphere with two point light sources. It was created by java raytracer.Main input-10.txt image-1.jpg in about a second.

@@ -16,7 +16,7 @@ public class Main {
 		System.out.println("Okay, let's roll.");
 		File frack = new File("temp.picture");
 		frack.createNewFile();
-
+		boolean boo = false;
 		PrintWriter printer = new PrintWriter("temp.picture", "UTF-8");
 		Scanner fake = new Scanner(new File(args[0]));
 		while (fake.hasNext()) {
@@ -25,6 +25,7 @@ public class Main {
 		int obj = 1;
 		for (; obj < args.length && args[obj].endsWith(".obj"); obj++) {
 			String read = readOBJ(args[obj]);
+			boo = true;
 			printer.println(read);
 		}
 		printer.close();
@@ -40,7 +41,7 @@ public class Main {
 		Transformation t = new Transformation(idenity);
 		AggregatePrimitive agg = new AggregatePrimitive();
 		ArrayList<Light> lights = new ArrayList<Light>();
-
+		double sp = -1;
 		try {
 			scan = new Scanner(new File("temp.picture"));
 		} catch (FileNotFoundException e) {
@@ -56,6 +57,9 @@ public class Main {
 			if (next.startsWith("UL")) {
 				ul = vectify(next.substring(next.indexOf('=') + 2,
 						next.length() - 1));
+			}
+			if (next.startsWith("sp")) {
+				sp = Double.parseDouble(next.substring(next.indexOf("=") + 1));
 			}
 			if (next.startsWith("UR")) {
 				ur = vectify(next.substring(next.indexOf('=') + 2,
@@ -148,12 +152,24 @@ public class Main {
 			}
 
 			if (next.startsWith("Triangle")) {
-				Vector v1 = badVectify(next.substring(next.indexOf('=') + 2,
-						next.indexOf(']')));
-				Vector v2 = badVectify(next.substring(next.indexOf("v2=") + 4,
-						next.indexOf("] v3")));
-				Vector v3 = badVectify(next.substring(next.indexOf("v3=") + 4,
-						next.length() - 1));
+				Vector v1 = null;
+				Vector v2 = null;
+				Vector v3 = null;
+				if (boo) {
+					v1 = badVectify(next.substring(next.indexOf('=') + 2,
+							next.indexOf(']')));
+					v2 = badVectify(next.substring(next.indexOf("v2=") + 4,
+							next.indexOf("] v3")));
+					v3 = badVectify(next.substring(next.indexOf("v3=") + 4,
+							next.length() - 1));
+				} else {
+					v1 = vectify(next.substring(next.indexOf('=') + 2,
+							next.indexOf(']')));
+					v2 = vectify(next.substring(next.indexOf("v2=") + 4,
+							next.indexOf("] v3")));
+					v3 = vectify(next.substring(next.indexOf("v3=") + 4,
+							next.length() - 1));
+				}
 				Triangle tri = new Triangle(v1, v2, v3);
 				Color ka = colorfy(scan);
 				Color kd = colorfy(scan);
@@ -163,12 +179,24 @@ public class Main {
 				agg.add(new GeometricPrimitive(t, t, tri, new Material(barfy)));
 			}
 			if (next.startsWith("NormalTriangle")) {
-				Vector v1 = badVectify(next.substring(next.indexOf('=') + 2,
-						next.indexOf(']')));
-				Vector v2 = badVectify(next.substring(next.indexOf("v2=") + 4,
-						next.indexOf("] v3")));
-				Vector v3 = badVectify(next.substring(next.indexOf("v3=") + 4,
-						next.length() - 1));
+				Vector v1 = null;
+				Vector v2 = null;
+				Vector v3 = null;
+				if (boo) {
+					v1 = badVectify(next.substring(next.indexOf('=') + 2,
+							next.indexOf(']')));
+					v2 = badVectify(next.substring(next.indexOf("v2=") + 4,
+							next.indexOf("] v3")));
+					v3 = badVectify(next.substring(next.indexOf("v3=") + 4,
+							next.length() - 1));
+				} else {
+					v1 = vectify(next.substring(next.indexOf('=') + 2,
+							next.indexOf(']')));
+					v2 = vectify(next.substring(next.indexOf("v2=") + 4,
+							next.indexOf("] v3")));
+					v3 = vectify(next.substring(next.indexOf("v3=") + 4,
+							next.length() - 1));
+				}
 				Color ka = colorfy(scan);
 				Color kd = colorfy(scan);
 				Color ks = colorfy(scan);
@@ -189,13 +217,16 @@ public class Main {
 		Sampler s = new Sampler(xpic, ypic);
 		Film f = new Film(xpic, ypic, args[obj]);
 		Camera c = new Camera(eyepos, ul, ur, ll, lr);
-//		System.out.println(c);
-//		System.out.println("Lights");
-//		for (Light l : lights) {
-//			System.out.println(l);
-//		}
-//		System.out.println(agg);
+		// System.out.println(c);
+		// System.out.println("Lights");
+		// for (Light l : lights) {
+		// System.out.println(l);
+		// }
+		// System.out.println(agg);
 		RayTracer r = new RayTracer(agg, lights, eyepos, 5);
+		if (sp != -1) {
+			r.setSp(sp);
+		}
 		Scene scene = new Scene(s, c, f, r);
 		scene.render();
 		frack.delete();

@@ -14,24 +14,22 @@ public class Color {
 			b = 1.0;
 		}
 		if (r < 0) {
-			System.err.println("Negetive r");
+			System.err.println("Tried to make color with negetive r");
 			System.exit(1);
 		}		
 		if (g < 0) {
-			System.err.println("Negetive g");
+			System.err.println("Tried to make color with negetive g");
 			System.exit(1);
 		}
 		if (b < 0) {
-			System.err.println("Negetive b");
+			System.err.println("Tried to make color with negetive b");
 			System.exit(1);
 		}
 		this.r = r;
 		this.g = g;
 		this.b = b;
 	}
-	public Color toThe(double fifty) {
-		return new Color(Math.pow(r, fifty), Math.pow(g, fifty), Math.pow(b, fifty));
-	}
+
 	public Color() {
 		this.r = 0;
 		this.g = 0;

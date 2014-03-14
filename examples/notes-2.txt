@@ -1,0 +1,1 @@
+This shows a triangle with specular shading, proving that I successfully implemented vertex normals. It was created by java raytracer.Main input-20.txt image-2.jpg in about five seconds.
