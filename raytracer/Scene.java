@@ -19,15 +19,10 @@ public class Scene {
 		Ray ray = new Ray(null, null, 0.01, Double.MAX_VALUE);
 		while (sampler.generateSample(sample)) {
 			Color color = new Color(0, 0, 0);
-
 			camera.generateRay(sample, ray);
-//			System.out.println(sample + " generaged " + ray);
 			raytracer.trace(ray, 0, color);
-			//System.out.println("Committing " + color);
 			film.commit(sample, color);
-
 		}
-
 		film.writeImage();
 	}
 	

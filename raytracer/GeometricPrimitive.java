@@ -14,21 +14,17 @@ public class GeometricPrimitive implements Primitive {
 	}
 
 	public String toString() {
-		return "Gprim: " + shape;
+		return shape + " transformed by " + worldToObj;
 	}
 	
 	@Override
 	public boolean intersect(Ray ray, Doublet thit, Intersection in) {
-		//System.out.println("Original " + ray);
-		//System.out.println("wobj" + worldToObj.m);
 		Ray oray = worldToObj.transform(ray);
-		//System.out.println("Then " + oray);
 		LocalGeo olocal = new LocalGeo();
 		if (!shape.intersect(oray, thit, olocal)) {
 			return false;
 		}
 		in.setPrimitive(this);
-		//System.out.println("objw"+objToWorld);
 		in.setLocalGeo(objToWorld.transform(olocal));
 		return true;
 	}

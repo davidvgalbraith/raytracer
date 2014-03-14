@@ -25,18 +25,12 @@ public class Camera {
 
 
 	void generateRay(Sample samp, Ray ray) {
-//		System.out.println(samp);
 		ray.setPos(eyepos);
 		double u = 1 - samp.getX();
 		double v = 1 - samp.getY();
-//		System.out.println(ll.times(v));
-//		System.out.println(ul.times(1-v));
 		Vector pv1 = (ll.times(v).plus(ul.times(1 - v))).times(u);
 		Vector pv2 = (lr.times(v).plus(ur.times(1 - v))).times(1-u);
 		Vector pv = pv1.plus(pv2);
-//		System.out.println(pv1);
-//		System.out.println(pv2);
-//		System.out.println(pv);
 		Point p = new Point(pv.getX(), pv.getY(), pv.getZ());
 		ray.setDir(p.minus(eyepos));
 	}

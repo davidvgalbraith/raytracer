@@ -2,15 +2,31 @@ package raytracer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		System.out.println("Okay, let's roll.");
-		String read = readOBJ(args[0]);
+		File frack = new File("temp.picture");
+		frack.createNewFile();
+
+		PrintWriter printer = new PrintWriter("temp.picture", "UTF-8");
+		Scanner fake = new Scanner(new File(args[0]));
+		while (fake.hasNext()) {
+			printer.println(fake.nextLine());
+		}
+		int obj = 1;
+		for (; obj < args.length && args[obj].endsWith(".obj"); obj++) {
+			String read = readOBJ(args[obj]);
+			printer.println(read);
+		}
+		printer.close();
 		Scanner scan = null;
 		Point eyepos = new Point(0, 0, 0);
 		int xpic = 100;
@@ -25,7 +41,7 @@ public class Main {
 		ArrayList<Light> lights = new ArrayList<Light>();
 
 		try {
-			scan = new Scanner(new File(args[0]));
+			scan = new Scanner(new File("temp.picture"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.exit(2);
@@ -79,11 +95,6 @@ public class Main {
 				translate.setValueAt(1, 3, center.getY());
 				translate.setValueAt(2, 3, center.getZ());
 				Matrix m = MatrixMathematics.multiply(translate, scale);
-				System.out.println("m\n" + m);
-				System.out.println("Minverse\n" + MatrixMathematics.inverse(m));
-				System.out.println("Produck \n"
-						+ MatrixMathematics.multiply(m,
-								MatrixMathematics.inverse(m)));
 				Transformation objToWorld = new Transformation(m);
 				Transformation worldToObj = new Transformation(
 						MatrixMathematics.inverse(m));
@@ -116,28 +127,21 @@ public class Main {
 				translate.setValueAt(1, 3, center.getY());
 				translate.setValueAt(2, 3, center.getZ());
 				Matrix rot = rottify(scan);
-				System.out.println("Rot is \n" + rot);
-				System.out.println("Scale is \n" + scale);
-				System.out.println("Trans is \n" + translate);
 				Matrix m = MatrixMathematics.multiply(rot, scale);
 				m = MatrixMathematics.multiply(translate, m);
 				Transformation objToWorld = new Transformation(m);
 				Transformation worldToObj = new Transformation(
 						MatrixMathematics.inverse(m));
-				System.out.println("m\n" + m);
-				System.out.println("Minverse\n" + MatrixMathematics.inverse(m));
 				Color ka = colorfy(scan);
 				Color kd = colorfy(scan);
 				Color ks = colorfy(scan);
 				Color kr = colorfy(scan);
 				BRDF barf = new BRDF(kd, ks, ka, kr);
-				System.out.println(barf);
 				agg.add(new GeometricPrimitive(objToWorld, worldToObj, unit,
 						new Material(barf)));
 			}
 
 			if (next.startsWith("Triangle")) {
-				System.out.println(next);
 				Vector v1 = vectify(next.substring(next.indexOf('=') + 2,
 						next.indexOf(']')));
 				Vector v2 = vectify(next.substring(next.indexOf("v2=") + 4,
@@ -152,10 +156,32 @@ public class Main {
 				BRDF barfy = new BRDF(kd, ks, ka, kr);
 				agg.add(new GeometricPrimitive(t, t, tri, new Material(barfy)));
 			}
+			if (next.startsWith("NormalTriangle")) {
+				Vector v1 = badVectify(next.substring(next.indexOf('=') + 2,
+						next.indexOf(']')));
+				Vector v2 = badVectify(next.substring(next.indexOf("v2=") + 4,
+						next.indexOf("] v3")));
+				Vector v3 = badVectify(next.substring(next.indexOf("v3=") + 4,
+						next.length() - 1));
+				Color ka = colorfy(scan);
+				Color kd = colorfy(scan);
+				Color ks = colorfy(scan);
+				Color kr = colorfy(scan);
+				BRDF barfy = new BRDF(kd, ks, ka, kr);
+				next = scan.nextLine();
+				Normal n1 = normalfy(next.substring(next.indexOf("n1=") + 4,
+						next.indexOf(']')));
+				Normal n2 = normalfy(next.substring(next.indexOf("n2=") + 4,
+						next.indexOf("] n3")));
+				Normal n3 = normalfy(next.substring(next.indexOf("n3=") + 4,
+						next.length() - 1));
+				NormalTriangle tri = new NormalTriangle(v1, v2, v3, n1, n2, n3);
+				agg.add(new GeometricPrimitive(t, t, tri, new Material(barfy)));
+			}
 		}
 
 		Sampler s = new Sampler(xpic, ypic);
-		Film f = new Film(xpic, ypic, args[1]);
+		Film f = new Film(xpic, ypic, args[obj]);
 		Camera c = new Camera(eyepos, ul, ur, ll, lr);
 		System.out.println(c);
 		System.out.println("Lights");
@@ -166,6 +192,7 @@ public class Main {
 		RayTracer r = new RayTracer(agg, lights, eyepos, 5);
 		Scene scene = new Scene(s, c, f, r);
 		scene.render();
+		frack.delete();
 		System.out.println("Whew.");
 	}
 
@@ -183,6 +210,14 @@ public class Main {
 		double y = Double.parseDouble(q.next());
 		double z = Double.parseDouble(q.next());
 		return new Vector(x, y, z);
+	}
+
+	static Vector badVectify(String s) {
+		Scanner q = new Scanner(s);
+		double x = Double.parseDouble(q.next());
+		double y = Double.parseDouble(q.next());
+		double z = Double.parseDouble(q.next());
+		return new Vector(x, y, z - 8);
 	}
 
 	static Color colorfy(String s) {
@@ -249,8 +284,6 @@ public class Main {
 			ret.setValueAt(1, 0, Math.sin(theta));
 			ret.setValueAt(1, 1, Math.cos(theta));
 		}
-		System.out.println(Math.toDegrees(theta) + " degrees about " + axis
-				+ " is \n" + ret);
 		return ret;
 	}
 
@@ -267,7 +300,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		while (s.hasNext()) {
-			String next = s.next();
+			String next = s.nextLine().trim();
 			if (next.startsWith("v ")) {
 				vertexes.put(vector, pointify(next.substring(1)));
 				vector += 1;
@@ -275,9 +308,11 @@ public class Main {
 			}
 			if (next.startsWith("vn ")) {
 				normals.put(normal, normalfy(next.substring(2)));
+				normal += 1;
+				continue;
 			}
 			if (next.startsWith("f ")) {
-				Scanner k = new Scanner(next);
+				Scanner k = new Scanner(next.substring(1));
 				String first = k.next();
 				Point v1;
 				Normal n1 = null;
@@ -312,9 +347,10 @@ public class Main {
 					v3 = vertexes.get(Integer.parseInt(third));
 				}
 				if (n1 != null) {
-					ret += "Triangle with v1=" + stringate(v1) + " v2="
+					ret += "NormalTriangle with v1=" + stringate(v1) + " v2="
 							+ stringate(v2) + " v3=" + stringate(v3) + "\n"
-							+ brdf() + "n1=" + stringate(n1) + " n2=" + stringate(n2) + " n3=" + stringate(n3);
+							+ brdf() + "n1=" + stringate(n1) + " n2="
+							+ stringate(n2) + " n3=" + stringate(n3) + "\n\n";
 				} else {
 					ret += "Triangle with v1=" + stringate(v1) + " v2="
 							+ stringate(v2) + " v3=" + stringate(v3) + "\n"
@@ -328,11 +364,26 @@ public class Main {
 	static String stringate(Point p) {
 		return "[ " + p.getX() + "  " + p.getY() + "  " + p.getZ() + " ]";
 	}
+
 	static String stringate(Normal p) {
 		return "[ " + p.getX() + "  " + p.getY() + "  " + p.getZ() + " ]";
 	}
+
 	static String brdf() {
-		return "ka=[ 0.1  0.1  0.1]\nkd=[ 0.  1.  1.]\nks=[ 1.  1.  1.]\nkr=[ 0.  0.  0.]\n";
+		Random randy = new Random();
+		boolean boo1 = randy.nextBoolean();
+		boolean boo2 = randy.nextBoolean();
+		if (boo1 && boo2) {
+			return "ka=[ 0.1  0.1  0.1]\nkd=[ 0.  1.  1.]\nks=[ 1.  1.  1.]\nkr=[ 0.  0.  0.]\n";
+		} else {
+			if (boo1) {
+				return "ka=[ 0.1  0.1  0.1]\nkd=[ 1.  0.  1.]\nks=[ 1.  1.  1.]\nkr=[ 0.  0.  0.]\n";
+			} else {
+				if (boo2) {
+					return "ka=[ 0.1  0.1  0.1]\nkd=[ 1.  1. 0 ]\nks=[ 1.  1.  1.]\nkr=[ 0.  0.  0.]\n";
+				}
+			}
+		}
+		return "ka=[ 0.1  0.1  0.1]\nkd=[ 1.  1.  1.]\nks=[ 1.  1.  1.]\nkr=[ 0.  0.  0.]\n";
 	}
-	finish parsing obj files, figure out vertex normals
 }

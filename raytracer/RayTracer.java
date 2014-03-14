@@ -48,29 +48,22 @@ public class RayTracer {
 			Ray lray = new Ray(null, null, 0, 0);
 			Color lcolor = new Color(0, 0, 0);
 			lights.get(i).generateLightRay(in.getLocalGeo(), lray, lcolor);
-			// Check if the light is blocked or not
 			if (depth == 0) {
 				color.setAll(color.plus(brdf.getKa().times(lcolor)));
-			} else {
-				//System.out.println("Reflection intersection at  " + d.getD());
 			}
-			if (!p.intersectP(lray)) {
+			// Check if the light is blocked or not
 
+			if (!p.intersectP(lray)) {
 				// If not, do shading calculation for this
 				// light source
-				// System.out.println("Hilarious! " + in.getLocalGeo() + " " +
-				// brdf + " " + lray + " " + lcolor);
 				color.setAll(color.plus(shading(in.getLocalGeo(), brdf, lray,
 						lcolor)));
-
 				// Handle mirror reflection
 			}
 		}
 		if (brdf.getKr().getB() > 0 || brdf.getKr().getG() > 0
 				|| brdf.getKr().getR() > 0) {
-			// System.out.println("ray was " + ray);
 			Ray reflectRay = createReflectRay(in.getLocalGeo(), ray);
-			// System.out.println("Ray is " + ray);
 			// Make a recursive call to trace the reflected ray
 			Color temp = new Color(0, 0, 0);
 			trace(reflectRay, depth + 1, temp);
@@ -80,8 +73,6 @@ public class RayTracer {
 	}
 
 	Ray createReflectRay(LocalGeo geo, Ray ray) {
-		// System.out.println(geo);
-		// System.out.println(ray);
 		Vector l = ray.getDir().normalize();
 		Vector n = geo.getNormal().vectorize();
 		Vector r = (l.times(-1).plus(n.times(2 * n.dot(l)))).times(-1);
@@ -91,23 +82,16 @@ public class RayTracer {
 
 	Color shading(LocalGeo geo, BRDF brdf, Ray lray, Color lcolor) {
 		Color spec = speculate(geo, brdf, lray, lcolor);
-		//System.out.println(spec);
 		Color diff = diffuse(geo, brdf, lray, lcolor);
 		return spec.plus(diff);
-		//return diff;
 	}
 
 	Color speculate(LocalGeo geo, BRDF brdf, Ray lray, Color lcolor) {
-		//System.out.println(geo);
 		Vector l = lray.getDir().normalize();
 		Vector n = geo.getNormal().vectorize();
 		Vector r = l.times(-1).plus(n.times(2 * n.dot(l))).normalize();
 		Vector v = origin.minus(geo.getPos()).normalize();
-		//if (!(origin.getX() == 0))
-			//System.out.println("Origin: " + origin);
-		//System.out.println("L " + l + "\nN " + n + "\nR " + r + "\nV " + v);
 		double dot = r.dot(v);
-		//System.out.println(dot);
 		if (dot < 0) {
 			dot = 0;
 		} else {

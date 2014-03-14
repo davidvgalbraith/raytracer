@@ -48,12 +48,20 @@ public class Vector {
 		double norm = Math.sqrt(x * x + y * y + z * z);
 		if (norm == 0) {
 			System.err.println("Divided by zero in " + this + ".normalize()");
-//			Integer k = null;
-//			k.doubleValue();
 			System.exit(10);
 		}
 
 		return new Vector(x / norm, y / norm, z / norm);
+	}
+
+	Normal normalate() {
+		double norm = Math.sqrt(x * x + y * y + z * z);
+		if (norm == 0) {
+			System.err.println("Divided by zero in " + this + ".normalate()");
+			System.exit(10);
+		}
+
+		return new Normal(x / norm, y / norm, z / norm);
 	}
 
 	public double getX() {
