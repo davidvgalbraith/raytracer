@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 public class Main {
 
+	/** Where the magic happens **/
 	public static void main(String[] args) throws IOException {
 		System.out.println("Okay, let's roll.");
 		File frack = new File("temp.picture");
@@ -70,6 +71,11 @@ public class Main {
 			}
 			if (next.startsWith("DL")) {
 				lights.add(new DirectionalLight(vectify(next.substring(
+						next.indexOf(',') + 2, next.length())), colorfy(next
+						.substring(5, next.indexOf(',') - 2))));
+			}
+			if (next.startsWith("PL")) {
+				lights.add(new PointLight(pointify(next.substring(
 						next.indexOf(',') + 2, next.length())), colorfy(next
 						.substring(5, next.indexOf(',') - 2))));
 			}
