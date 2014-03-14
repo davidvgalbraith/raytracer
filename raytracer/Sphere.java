@@ -11,9 +11,8 @@ public class Sphere implements Shape {
 
 	@Override
 	public boolean intersect(Ray ray, Doublet thit, LocalGeo local) {
-		if (thit.getD() == 69) {
+		///if (ray.getPos().getZ() == 8.5)
 			//System.out.println(ray + " ? " + this);
-		}
 		Point e = ray.getPos();
 		Vector d = ray.getDir();
 		Vector emc = e.minus(center);
@@ -22,6 +21,13 @@ public class Sphere implements Shape {
 		double c = emc.dot(emc) - radius * radius;
 		double disc = b * b - 4 * a * c;
 		if (disc < 0) {
+			if (ray.getPos().getZ() == 8.5) {
+
+//			System.out.println("Nope! " + disc);
+//			System.out.println(a);
+//			System.out.println(b);
+//			System.out.println(c);
+			}
 			return false;
 		}
 		double t1 = (-1 * b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
@@ -30,11 +36,17 @@ public class Sphere implements Shape {
 		g.add(t1);
 		g.add(t2);
 		if (g.size() == 0) {
+//			if (ray.getPos().getZ() == 8.5) {
+//
+//			System.out.println("FUCK!");
+//			System.out.println(t1);
+//			System.out.println(t2);
+//			}
 			return false;
 		}
 		//System.out.println("Yes!");
 		double thitt = g.smaller();
-//		System.out.println("Thit is " + thitt);
+		//System.out.println("Thit is " + thitt);
 		thit.setD(thitt);
 		local.setPos(ray.eval(thitt));
 		local.setNormal(Normal.normalize(ray.eval(thitt).minus(center)));
@@ -63,9 +75,11 @@ public class Sphere implements Shape {
 		}
 		return true;
 	}
+
 	public String toString() {
 		return "a sphere of radius " + radius + " centered at " + center;
 	}
+
 	public boolean isTriangle() {
 		return false;
 	}

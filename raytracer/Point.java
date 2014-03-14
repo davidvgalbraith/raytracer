@@ -12,6 +12,7 @@ public class Point {
 	Vector toVect() {
 		return new Vector(x, y, z);
 	}
+
 	Point times(double a) {
 		return new Point(x * a, y * a, z * a);
 	}

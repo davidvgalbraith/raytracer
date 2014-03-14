@@ -8,13 +8,14 @@ public class RayTracer {
 	List<Light> lights;
 	Point origin;
 	int maxDepth;
-	
+
 	public RayTracer() {
 		this.p = new AggregatePrimitive(new ArrayList<Primitive>());
 		this.lights = new ArrayList<Light>();
 	}
 
-	public RayTracer(AggregatePrimitive p, List<Light> lights, Point origin, int maxDepth) {
+	public RayTracer(AggregatePrimitive p, List<Light> lights, Point origin,
+			int maxDepth) {
 		this.p = p;
 		this.lights = lights;
 		this.origin = origin;
@@ -22,9 +23,6 @@ public class RayTracer {
 	}
 
 	void trace(Ray ray, int depth, Color color) {
-		if (depth > 0) {
-			System.out.println("KATNISS ABERDEEN " + ray);
-		}
 		Doublet d = new Doublet(0);
 
 		origin = ray.getPos();
@@ -53,6 +51,8 @@ public class RayTracer {
 			// Check if the light is blocked or not
 			if (depth == 0) {
 				color.setAll(color.plus(brdf.getKa().times(lcolor)));
+			} else {
+				//System.out.println("Reflection intersection at  " + d.getD());
 			}
 			if (!p.intersectP(lray)) {
 
@@ -73,46 +73,46 @@ public class RayTracer {
 			// System.out.println("Ray is " + ray);
 			// Make a recursive call to trace the reflected ray
 			Color temp = new Color(0, 0, 0);
-			// System.out.println("Yes this is dog" + depth);
 			trace(reflectRay, depth + 1, temp);
-//			System.out.println(color + " Not now dog); " + temp);
 			color.setAll(color.plus(temp.times(brdf.getKr())));
 
 		}
 	}
 
 	Ray createReflectRay(LocalGeo geo, Ray ray) {
+		// System.out.println(geo);
+		// System.out.println(ray);
 		Vector l = ray.getDir().normalize();
 		Vector n = geo.getNormal().vectorize();
-		Vector r = (l.times(-1).plus(n.times(2 * n.dot(l))).normalize())
-				.times(-1);
+		Vector r = (l.times(-1).plus(n.times(2 * n.dot(l)))).times(-1);
 		Ray rey = new Ray(geo.getPos(), r, 0.01, Double.MAX_VALUE);
 		return rey;
 	}
 
 	Color shading(LocalGeo geo, BRDF brdf, Ray lray, Color lcolor) {
 		Color spec = speculate(geo, brdf, lray, lcolor);
+		//System.out.println(spec);
 		Color diff = diffuse(geo, brdf, lray, lcolor);
-		// System.out.println("Diff: " + diff);
 		return spec.plus(diff);
-		// return spec;
-		// return diff;
+		//return diff;
 	}
 
 	Color speculate(LocalGeo geo, BRDF brdf, Ray lray, Color lcolor) {
+		//System.out.println(geo);
 		Vector l = lray.getDir().normalize();
 		Vector n = geo.getNormal().vectorize();
 		Vector r = l.times(-1).plus(n.times(2 * n.dot(l))).normalize();
 		Vector v = origin.minus(geo.getPos()).normalize();
-		// System.out.println("Noraml was " + geo.getNormal() +
-		// " and  pointlnnelsly calculated " + v);
+		//if (!(origin.getX() == 0))
+			//System.out.println("Origin: " + origin);
+		//System.out.println("L " + l + "\nN " + n + "\nR " + r + "\nV " + v);
 		double dot = r.dot(v);
+		//System.out.println(dot);
 		if (dot < 0) {
 			dot = 0;
 		} else {
 			dot = Math.pow(dot, 50);
 		}
-		// System.out.println("Dof " + dot);
 		return colorific(dot, brdf.getKs(), lcolor);
 	}
 

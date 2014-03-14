@@ -1,12 +1,14 @@
 package raytracer;
 
 public class Transformation {
-	Matrix m, minvt;
+	Matrix m;
 
 	public Transformation(Matrix m) {
 		this.m = m;
-			this.minvt = MatrixMathematics.transpose(MatrixMathematics
-					.inverse(m));
+	}
+
+	public String toString() {
+		return "Transformation: \n" + m;
 	}
 
 	Point transform(Point a) {
@@ -20,7 +22,7 @@ public class Transformation {
 	}
 
 	Ray transform(Ray a) {
-		return new Ray(transform(a.getPos()), transform(a.getDir()),//transform(a.getDir()).minus(transform(a.getPos().toVect())),
+		return new Ray(transform(a.getPos()), transform(a.getDir()),
 				a.getTmin(), a.getTmax());
 	}
 
@@ -44,10 +46,8 @@ public class Transformation {
 		toarr[1] = a.getY();
 		toarr[2] = a.getZ();
 		toarr[3] = 0;
-		double[] x = MatrixMathematics.transpose(m).times(toarr);
-		System.out.println("Prevnorm = " + a);
-		Normal b = new Normal(x[0], x[1], x[2]);
-		System.out.println("New normal " + b);
+		double[] x = MatrixMathematics.transpose(MatrixMathematics.inverse(m)).times(toarr);
+		// Normal b = new Normal(x[0], x[1], x[2]);
 		return new Normal(x[0], x[1], x[2]);
 	}
 }
