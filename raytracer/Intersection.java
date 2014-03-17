@@ -30,3 +30,4 @@ public class Intersection {
 		this.primitive = primitive;
 	}
 }
+   

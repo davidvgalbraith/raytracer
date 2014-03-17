@@ -7,3 +7,4 @@ public interface Primitive {
 
     void getBRDF(LocalGeo local, BRDF brdf);
 }
+   

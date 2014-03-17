@@ -17,3 +17,4 @@ public interface Shape {
 	
 	boolean isTriangle();
 }
+   

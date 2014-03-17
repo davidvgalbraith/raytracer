@@ -41,3 +41,4 @@ public class BRDF {
 		this.kr = kr;
 	}
 }
+   

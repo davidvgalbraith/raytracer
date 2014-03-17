@@ -39,3 +39,4 @@ public class Camera {
 		return "Camera\n Eyepos: " + eyepos + "\n ll " + ll + "\n ul " + ul + "\n lr " + lr + "\n ur " + ur;
 	}
 }
+   

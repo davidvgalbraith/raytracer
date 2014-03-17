@@ -58,3 +58,4 @@ public class AggregatePrimitive implements Primitive {
 		return s;
 	}
 }
+   

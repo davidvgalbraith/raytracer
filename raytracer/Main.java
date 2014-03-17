@@ -424,3 +424,4 @@ public class Main {
 		return "ka=[ 0.1  0.1  0.1]\nkd=[ 1.  1.  1.]\nks=[ 1.  1.  1.]\nkr=[ 0.  0.  0.]\n";
 	}
 }
+   

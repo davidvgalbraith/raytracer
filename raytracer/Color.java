@@ -101,3 +101,4 @@ public class Color {
 		this.b = a.getB();
 	}
 }
+   
