@@ -1,5 +1,6 @@
 (function() {
-
+    //universal loop index
+    var k;
     //scene and its components
 
     var scene = function(sampler, camera, film, raytracer) {}
@@ -13,42 +14,10 @@
     var sphere = function() {}
     var triangle = function() {}
 
-    //helper functions to extract lights and shapes from a file
-    var getLights = function(objects) {
-	var lights = [];
-	for (var k = 2; k < objects.length; k++) {
-	    var light = objects[k];
-	    if (light.type === "DL") {
-		light.prototype = directionalight;
-		lights.push(light);
-	    }
-	    if (light.type === "PL") {
-		light.prototype = pointlight;
-		lights.push(light);
-	    }
-	}
-	return lights;
-    }
-
-    var getShapes = function(objects) {
-	var shapes = [];
-	for (var k = 2; k < objects.length; k++) {
-	    var shape = objects[k];
-	    if (shape.type === "sphere") {
-		shape.prototype = sphere;
-		shapes.push(shape);
-	    }
-	    if (shape.type === "triangle") {
-		shape.prototype = triangle;
-		shapes.push(shape);
-	    }
-	}
-	return shapes;
-    }
     //prep the canvas
     var c = document.getElementById("myCanvas");
     var ctx = c.getContext("2d");
-    var imgData = ctx.createImageData(100, 100);
+    var imgData = ctx.createImageData(1000, 1000);
    
     //read the input file
     var inputFile = new XMLHttpRequest();
@@ -58,19 +27,30 @@
     var objects = JSON.parse(text);
     
     //parse the input file
-    var cam = objects[0];
+    var cam = objects["camera"];
     cam.prototype = camera;
-    var flm = objects[1];
+    var flm = objects["film"];
     flm.prototype = film;
-    var lights = getLights(objects);
-    var shapes = getShapes(objects);
-    
-    //draw
-    for (var i = 0; i < imgData.data.length; i += 4) {
-	imgData.data[i] = 0;
-	imgData.data[i+1] = 0;
-	imgData.data[i+2] = 0;
-	imgData.data[i+3] = 255;
+    var samp = sampler(flm.pixelsX, flm.pixelsY);
+    var lights = objects["lights"];
+    for (k = 0; k < lights.length; k++) {
+	if (lights[k].type === "DL") {
+	    lights[k].prototype = directionalight;
+	}
+	if (lights[k].type === "PL") {
+	    lights[k].prototype = pointlight;
+	}
     }
+    for (k = 0; k < shapes.length; k++) {
+	if (shapes[k].type === "sphere") {
+	    shapes[k].prototype = sphere;
+	}
+	if (shapes[k].type === "triangle") {
+	    shapes[k].prototype = triangle;
+	}
+    }
+    var ray = raytracer(shapes, lights, cam.eye, 5);
+    var picture = scene(samp, cam, flm, ray);
+    imgData.data = picture;
     ctx.putImageData(imgData, 0, 0);
 }());
