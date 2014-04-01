@@ -21,8 +21,8 @@ public class Sphere implements Shape {
 		if (disc < 0) {
 			return false;
 		}
-		double t1 = (-1 * b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
-		double t2 = (-1 * b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+		double t1 = (-1 * b + Math.sqrt(disc)) / (2 * a);
+		double t2 = (-1 * b - Math.sqrt(disc)) / (2 * a);
 		Garbage g = new Garbage(ray.getTmin(), ray.getTmax());
 		g.add(t1);
 		g.add(t2);

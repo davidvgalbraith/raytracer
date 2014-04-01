@@ -1,5 +1,6 @@
 package raytracer;
 
+/*sequentially returns coordinates of centers of vertices (useless)*/
 public class Sampler {
 	double maxx;
 	double maxy;
