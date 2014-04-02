@@ -213,16 +213,9 @@ public class Main {
 				agg.add(new GeometricPrimitive(t, t, tri, new Material(barfy)));
 			}
 		}
-
 		Sampler s = new Sampler(xpic, ypic);
 		Film f = new Film(xpic, ypic, args[obj]);
 		Camera c = new Camera(eyepos, ul, ur, ll, lr);
-		// System.out.println(c);
-		// System.out.println("Lights");
-		// for (Light l : lights) {
-		// System.out.println(l);
-		// }
-		// System.out.println(agg);
 		RayTracer r = new RayTracer(agg, lights, eyepos, 5);
 		if (sp != -1) {
 			r.setSp(sp);

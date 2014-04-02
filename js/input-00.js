@@ -6,17 +6,17 @@
 	"LR":[ 1, -1, -3],
 	"UR":[ 1,  1, -3],
 	"UL":[-1,  1, -3],
-	"pixelsX":500,
-	"pixelsY":500
+	"pixelsX":200,
+	"pixelsY":200
     },
     "lights": [
 	{
-	    "type":"DL",
+	    "type":"directional",
 	    "direction": [ 0.57735027, -0.57735027, -0.57735027 ],
 	    "color":[ 1,  1,  1]
 	},
 	{
-	    "type":"DL",
+	    "type":"directional",
 	    "direction": [ -0.57735027, 0.57735027, 0.57735027 ],
 	    "color":[ 1,  1,  1]
 	}
