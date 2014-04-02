@@ -30,12 +30,10 @@ public class NormalTriangle implements Shape {
 		double gamma = (i * akjb + h * jcal + g * blkc) / m;
 		double t  = -1 * (f * akjb + e * jcal + d * blkc) / m;
 		if (t < ray.getTmin() || t > ray.getTmax() || gamma < 0 || gamma > 1 || beta < 0 || beta > 1-gamma) {
-			return false;
+		    return false;
 		}
 		thit.setD(t);
 		local.setPos(ray.eval(t));
-		//Vector norm1 = ((vb.minus(va)).cross((vc.minus(va)))).normalize();
-//		local.setNormal(new Normal(norm1.getX(), norm1.getY(), norm1.getZ()));
 		Vector none = n1.vectorize();
 		Vector ntwo = n2.vectorize();
 		Vector nthree = n3.vectorize();

@@ -113,6 +113,47 @@
 			ret.shape = shape;
 		    }
 		}
+		if (shape.type === "triangle") {
+		    var ve = rayr.position;
+		    var vd = rayr.direction;
+		    var vc = vector(shape.vc);
+		    var vb = vector(shape.vb);
+		    var va = vector(shape.va);
+		    var a = va.x - vb.x;
+		    var b = va.y - vb.y;
+		    var c = va.z - vb.z;
+		    var d = va.x - vc.x;
+		    var e = va.y - vc.y;
+		    var f = va.z - vc.z;
+		    var g = vd.x;
+		    var h = vd.y;
+		    var i = vd.z;
+		    var j = va.x - ve.x;
+		    var k = va.y - ve.y;
+		    var l = va.z - ve.z;
+		    var eihf = e * i - h * f;
+		    var gfdi = g * f - d * i;
+		    var dheg = d * h - e * g;
+		    var akjb = a * k - j * b;
+		    var jcal = j * c - a * l;
+		    var blkc = b * l - k * c;
+		    var m = a * eihf + b * gfdi + c * dheg;
+		    var beta = (j * eihf + k * gfdi + l * dheg) / m;
+		    var gamma = (i * akjb + h * jcal + g * blkc) / m;
+		    var t  = -1 * (f * akjb + e * jcal + d * blkc) / m;
+		    if (t < .001 || t > tmin || gamma < 0 || gamma > 1 || beta < 0 || beta > 1-gamma) {
+			continue;
+		    }
+		    ret = {};
+		    tmin = t;
+		    if (shape.normals) {
+			ret.normal = ray(rayr.valueAt(t), (shape.normals[0].times(1-beta-gamma).plus(shape.normals[1].times(beta)).plus(shape.normals[2].times(gamma))).normalize());
+			ret.shape = shape;
+		    } else {
+			ret.normal = ray(rayr.valueAt(t), ((shape.vb.minus(shape.va)).cross(shape.vc.minus(shape.va))).normalize());
+			ret.shape = shape;
+		    }
+		}
 	    }
 	    return ret;
 	}
