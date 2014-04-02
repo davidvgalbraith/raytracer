@@ -124,6 +124,36 @@
 			ret.shape = shape;
 		    }
 		}
+		if (shape.type === "ellipsoid") {
+		    var scale = matrix(4, 4);
+		    scale.setValueAt(0, 0, shape.rx);
+		    scale.setValueAt(1, 1, shape.ry);
+		    scale.setValueAt(2, 2, shape.rz);
+		    var translate = matrix(4, 4);
+		    translate.setValueAt(0, 3, shape.center[0]);
+		    translate.setValueAt(1, 3, shape.center[1]);
+		    translate.setValueAt(2, 3, shape.center[2]);
+		    var rotx = matrix.rotation("x", Math.PI/180 * shape.rotx);
+		    var roty = matrix.rotation("y", Math.PI/180 * shape.roty);
+		    var rotz = matrix.rotation("z", Math.PI/180 * shape.rotz);
+		    var rotate = rotx.times(roty).times(rotz);
+		    var objToWorld = rotate.times(scale);
+		    objToWorld = translate.times(objToWorld);
+		    var descale = matrix(4, 4);
+		    descale.setValueAt(0, 0, 1/shape.rx);
+		    descale.setValueAt(1, 1, 1/shape.ry);
+		    descale.setValueAt(2, 2, 1/shape.rz);
+		    var detranslate = matrix(4, 4);
+		    detranslate.setValueAt(0, 3, -shape.center[0]);
+		    detranslate.setValueAt(1, 3, -shape.center[1]);
+		    detranslate.setValueAt(2, 3, -shape.center[2]);
+		    var derotx = matrix.rotation("x", -Math.PI/180 * shape.rotx);
+		    var deroty = matrix.rotation("y", -Math.PI/180 * shape.roty);
+		    var derotz = matrix.rotation("z", -Math.PI/180 * shape.rotz);
+		    var derotate = derotz.times(deroty).times(derotx);
+		    var worldToObj = derotate.times(detranslate);
+		    worldToObj = descale.times(worldToObj);
+		}
 		if (shape.type === "triangle") {
 		    //incomprehensible sequence of operations to find intersection
 		    var ve = rayr.position;
@@ -222,6 +252,84 @@
 	return v;
     }
 
+    //matrix operations that we'll be needing for transformations
+    var matrix = function(rows, colums) {
+	//gives you the rotation of theta radians about axis axis
+	var rotation = function(axis, theta) {
+	    var ret = matrix(4, 4);
+	    if (axis == "x") {
+		ret.setValueAt(1, 1, Math.cos(theta));
+		ret.setValueAt(1, 2, -Math.sin(theta));
+		ret.setValueAt(2, 1, Math.sin(theta));
+		ret.setValueAt(2, 2, Math.cos(theta));
+	    }
+	    if (axis == "y") {
+		ret.setValueAt(0, 0, Math.cos(theta));
+		ret.setValueAt(0, 2, -Math.sin(theta));
+		ret.setValueAt(2, 0, Math.sin(theta));
+		ret.setValueAt(2, 2, Math.cos(theta));
+	    }
+	    if (axis == "z") {
+		ret.setValueAt(0, 0, Math.cos(theta));
+		ret.setValueAt(0, 1, -Math.sin(theta));
+		ret.setValueAt(1, 0, Math.sin(theta));
+		ret.setValueAt(1, 1, Math.cos(theta));
+	    }
+	    return ret;
+	}
+	var m = {};
+	m.data = [];
+	m.rows = rows;
+	m.colums = colums;
+	//initialize to idenity
+	for (var row = 0; row < rows; row++) {
+	    m.data[row] = [];
+	    for (var col = 0; col < colums; col++) {
+		m.data[row][col] = (row === col) ? 1 : 0;
+	    }
+	}
+	m.setValueAt = function(row, colum, value) {
+	    m.data[row][colum] = value;
+	}
+	m.times = function(n) {
+	    var ii, jj, kk;
+	    var newmat = matrix(m.rows, n.colums);
+	    for (ii = 0; ii < newmat.rows; ii++) {
+		for (jj = 0; jj < newmat.colums; jj++) {
+		    var sum = 0;
+		    for (kk = 0; kk < m.colums; kk++) {
+			sum += m.data[ii][kk] * n.data[kk][jj];
+		    }
+		    newmat.setValueAt(ii, jj, sum);
+		}
+	    }
+	    return newmat;
+	}
+	//multiply the matrix by vect, an array representing a 4-vector
+	m.vectortimes = function(vect) {
+	    var ii, jj;
+	    if (m.colums !== vect.length) {
+		console.log("Invalid matrix-vector produck");
+	    }
+	    var result = zeros(m.rows);
+	    for (ii = 0; ii < m.rows; ii++) {
+		for (jj = 0; jj < m.colums; jj++) {
+		    result[ii] += m.valueAt(ii, jj) * vect[jj];
+		}
+	    }
+	    return result;
+	}
+	return m;
+    }
+
+    var zeros = function(n) {
+	var result = [];
+	for (var kthzero = 0; kthzero < n; kthzero++) {
+	    result.push(0);
+	}
+	return result;
+    }
+    
     //read the input file
     var inputFile = new XMLHttpRequest();
     inputFile.open("GET", "file:///home/dave/ray/js/input-10.js", false);

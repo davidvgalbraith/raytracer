@@ -47,7 +47,6 @@ public class Transformation {
 		toarr[2] = a.getZ();
 		toarr[3] = 0;
 		double[] x = MatrixMathematics.transpose(MatrixMathematics.inverse(m)).times(toarr);
-		// Normal b = new Normal(x[0], x[1], x[2]);
 		return new Normal(x[0], x[1], x[2]);
 	}
 }
