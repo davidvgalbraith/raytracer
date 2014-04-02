@@ -1,5 +1,4 @@
 //a javascript raytracer
-//too slow to be useful but I like it anyway
 
 (function() {
 
@@ -209,7 +208,7 @@
 	    var norm = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 	    if (norm === 0) {
 		console.log("Tried to normalize a zero vector");
-		return this;
+		return v;
 	    }
 	    return vector([v.x / norm, v.y / norm, v.z / norm]);
 	}
@@ -317,7 +316,7 @@
     
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "file:///home/dave/ray/js/input-20.js", false);
+    inputFile.open("GET", "file:///home/dave/ray/js/input-30.js", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);
