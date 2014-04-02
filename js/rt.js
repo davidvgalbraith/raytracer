@@ -95,10 +95,13 @@
 	    var ret = null;
 	    for (var k = 0; k < shapes.length; k++) {
 		var shape = shapes[k];
+		var tpos = shape.worldToObj.homomult(rayr.position, 1);
+		var tdir = shape.worldToObj.homomult(rayr.direction, 0);
+		var transray = ray(tpos, tdir);
 		if (shape.type === "sphere") {
-		    var emc = rayr.position.minus(vector(shape.center));
-		    var a = rayr.direction.dot(rayr.direction);
-		    var b = 2 * rayr.direction.dot(emc);
+		    var emc = transray.position.minus(vector(shape.center));
+		    var a = transray.direction.dot(transray.direction);
+		    var b = 2 * transray.direction.dot(emc);
 		    var c = emc.dot(emc) - shape.radius * shape.radius;
 		    var disc = b * b - 4 * a * c;		    		 
 		    if (disc < 0) {
@@ -120,44 +123,14 @@
 		    }
 		    if (thit < tmin) {
 			tmin = thit; 
-			ret.normal = ray(rayr.valueAt(thit), rayr.valueAt(thit).minus(vector(shape.center)).normalize());
+			ret.normal = ray(shape.objToWorld.homomult(transray.valueAt(thit), 1), shape.worldToObj.transpose().homomult(transray.valueAt(thit).minus(vector(shape.center)), 0).normalize());
 			ret.shape = shape;
 		    }
 		}
-		if (shape.type === "ellipsoid") {
-		    var scale = matrix(4, 4);
-		    scale.setValueAt(0, 0, shape.rx);
-		    scale.setValueAt(1, 1, shape.ry);
-		    scale.setValueAt(2, 2, shape.rz);
-		    var translate = matrix(4, 4);
-		    translate.setValueAt(0, 3, shape.center[0]);
-		    translate.setValueAt(1, 3, shape.center[1]);
-		    translate.setValueAt(2, 3, shape.center[2]);
-		    var rotx = matrix.rotation("x", Math.PI/180 * shape.rotx);
-		    var roty = matrix.rotation("y", Math.PI/180 * shape.roty);
-		    var rotz = matrix.rotation("z", Math.PI/180 * shape.rotz);
-		    var rotate = rotx.times(roty).times(rotz);
-		    var objToWorld = rotate.times(scale);
-		    objToWorld = translate.times(objToWorld);
-		    var descale = matrix(4, 4);
-		    descale.setValueAt(0, 0, 1/shape.rx);
-		    descale.setValueAt(1, 1, 1/shape.ry);
-		    descale.setValueAt(2, 2, 1/shape.rz);
-		    var detranslate = matrix(4, 4);
-		    detranslate.setValueAt(0, 3, -shape.center[0]);
-		    detranslate.setValueAt(1, 3, -shape.center[1]);
-		    detranslate.setValueAt(2, 3, -shape.center[2]);
-		    var derotx = matrix.rotation("x", -Math.PI/180 * shape.rotx);
-		    var deroty = matrix.rotation("y", -Math.PI/180 * shape.roty);
-		    var derotz = matrix.rotation("z", -Math.PI/180 * shape.rotz);
-		    var derotate = derotz.times(deroty).times(derotx);
-		    var worldToObj = derotate.times(detranslate);
-		    worldToObj = descale.times(worldToObj);
-		}
 		if (shape.type === "triangle") {
 		    //incomprehensible sequence of operations to find intersection
-		    var ve = rayr.position;
-		    var vd = rayr.direction;
+		    var ve = transray.position;
+		    var vd = transray.direction;
 		    var vc = vector(shape.vc);
 		    var vb = vector(shape.vb);
 		    var va = vector(shape.va);
@@ -189,10 +162,10 @@
 		    ret = {};
 		    tmin = t;
 		    if (shape.normals) {
-			ret.normal = ray(rayr.valueAt(t), (shape.normals[0].times(1-beta-gamma).plus(shape.normals[1].times(beta)).plus(shape.normals[2].times(gamma))).normalize());
+			ret.normal = ray(transray.valueAt(t), (shape.normals[0].times(1-beta-gamma).plus(shape.normals[1].times(beta)).plus(shape.normals[2].times(gamma))).normalize());
 			ret.shape = shape;
 		    } else {
-			ret.normal = ray(rayr.valueAt(t), ((vb.minus(va)).cross(vc.minus(va))).normalize());
+			ret.normal = ray(transray.valueAt(t), ((vb.minus(va)).cross(vc.minus(va))).normalize());
 			ret.shape = shape;
 		    }
 		}
@@ -254,42 +227,16 @@
 
     //matrix operations that we'll be needing for transformations
     var matrix = function(rows, colums) {
-	//gives you the rotation of theta radians about axis axis
-	var rotation = function(axis, theta) {
-	    var ret = matrix(4, 4);
-	    if (axis == "x") {
-		ret.setValueAt(1, 1, Math.cos(theta));
-		ret.setValueAt(1, 2, -Math.sin(theta));
-		ret.setValueAt(2, 1, Math.sin(theta));
-		ret.setValueAt(2, 2, Math.cos(theta));
-	    }
-	    if (axis == "y") {
-		ret.setValueAt(0, 0, Math.cos(theta));
-		ret.setValueAt(0, 2, -Math.sin(theta));
-		ret.setValueAt(2, 0, Math.sin(theta));
-		ret.setValueAt(2, 2, Math.cos(theta));
-	    }
-	    if (axis == "z") {
-		ret.setValueAt(0, 0, Math.cos(theta));
-		ret.setValueAt(0, 1, -Math.sin(theta));
-		ret.setValueAt(1, 0, Math.sin(theta));
-		ret.setValueAt(1, 1, Math.cos(theta));
-	    }
-	    return ret;
-	}
 	var m = {};
-	m.data = [];
 	m.rows = rows;
 	m.colums = colums;
+	m.data = [];
 	//initialize to idenity
 	for (var row = 0; row < rows; row++) {
 	    m.data[row] = [];
 	    for (var col = 0; col < colums; col++) {
 		m.data[row][col] = (row === col) ? 1 : 0;
 	    }
-	}
-	m.setValueAt = function(row, colum, value) {
-	    m.data[row][colum] = value;
 	}
 	m.times = function(n) {
 	    var ii, jj, kk;
@@ -300,28 +247,66 @@
 		    for (kk = 0; kk < m.colums; kk++) {
 			sum += m.data[ii][kk] * n.data[kk][jj];
 		    }
-		    newmat.setValueAt(ii, jj, sum);
+		    newmat.data[ii][jj] = sum;
 		}
 	    }
 	    return newmat;
 	}
-	//multiply the matrix by vect, an array representing a 4-vector
-	m.vectortimes = function(vect) {
-	    var ii, jj;
-	    if (m.colums !== vect.length) {
-		console.log("Invalid matrix-vector produck");
+	//homogeneous multiplication of this matrix by vect augmented by fourth
+	m.homomult = function(vect, fourth) {
+	    var i, j;
+	    if (m.colums !== 4) {
+		throw "Invalid quaternary transformation";
 	    }
 	    var result = zeros(m.rows);
-	    for (ii = 0; ii < m.rows; ii++) {
-		for (jj = 0; jj < m.colums; jj++) {
-		    result[ii] += m.valueAt(ii, jj) * vect[jj];
+	    var vecarray = [vect.x, vect.y, vect.z, fourth];
+	    for (i = 0; i < m.rows; i++) {
+		for (j = 0; j < m.colums; j++) {
+		    result[i] += m.data[i][j] * vecarray[j];
 		}
 	    }
-	    return result;
+	    if (fourth === 1) {
+		return vector([result[0] / result[3], result[1] / result[3], result[2] / result[3]]);
+	    } else {
+		return vector([result[0], result[1], result[2]]);
+	    }
+	}
+	m.transpose = function() { 
+	    var i, j;
+	    var ret = matrix(m.colums, m.rows);
+	    for (i = 0; i < m.rows; i++) {
+		for (j = 0; j < m.colums; j++) {
+		    ret.data[j][i] = m.data[i][j];
+		}
+	    }
+	    return ret;
 	}
 	return m;
     }
 
+    //gives you the rotation matrix of theta radians about axis axis
+    var rotation = function(axis, theta) {
+	var ret = matrix(4, 4);
+	if (axis == "x") {
+	    ret.data[1][1] = Math.cos(theta);
+	    ret.data[1][2] = -Math.sin(theta);
+	    ret.data[2][1] = Math.sin(theta);
+	    ret.data[2][2] = Math.cos(theta);
+	}
+	if (axis == "y") {
+	    ret.data[0][0] = Math.cos(theta);
+	    ret.data[0][2] = -Math.sin(theta);
+	    ret.data[2][0] = Math.sin(theta);
+	    ret.data[2][2] = Math.cos(theta);
+	}
+	if (axis == "z") {
+	    ret.data[0][0] = Math.cos(theta);
+	    ret.data[0][1] = -Math.sin(theta);
+	    ret.data[1][0] = Math.sin(theta);
+	    ret.data[1][1] = Math.cos(theta);
+	}
+	return ret;
+    }
     var zeros = function(n) {
 	var result = [];
 	for (var kthzero = 0; kthzero < n; kthzero++) {
@@ -332,7 +317,7 @@
     
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "file:///home/dave/ray/js/input-10.js", false);
+    inputFile.open("GET", "file:///home/dave/ray/js/input-20.js", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);
@@ -344,7 +329,47 @@
     cam.LL = vector(cam.LL);
     cam.LR = vector(cam.LR);
     var lights = objects["lights"];
-
+    for (var shapeIndex = 0; shapeIndex < objects["shapes"].length; shapeIndex++) {
+	var shape = objects["shapes"][shapeIndex];
+	if (shape.type === "ellipsoid") {
+	    var scale = matrix(4, 4);
+	    scale.data[0][0] = shape.rx;
+	    scale.data[1][1] = shape.ry;
+	    scale.data[2][2] = shape.rz;
+	    var translate = matrix(4, 4);
+	    translate.data[0][3] = shape.center[0];
+	    translate.data[1][3] = shape.center[1];
+	    translate.data[2][3] = shape.center[2];
+	    var rotx = rotation("x", Math.PI/180 * shape.rotx);
+	    var roty = rotation("y", Math.PI/180 * shape.roty);
+	    var rotz = rotation("z", Math.PI/180 * shape.rotz);
+	    var rotate = rotx.times(roty).times(rotz);
+	    var objToWorld = rotate.times(scale);
+	    objToWorld = translate.times(objToWorld);
+	    var descale = matrix(4, 4);
+	    descale.data[0][0] = 1/shape.rx;
+	    descale.data[1][1] = 1/shape.ry;
+	    descale.data[2][2] = 1/shape.rz;
+	    var detranslate = matrix(4, 4);
+	    detranslate.data[0][3] = -shape.center[0];
+	    detranslate.data[1][3] = -shape.center[1];
+	    detranslate.data[2][3] = -shape.center[2];
+	    var derotx = rotation("x", -Math.PI/180 * shape.rotx);
+	    var deroty = rotation("y", -Math.PI/180 * shape.roty);
+	    var derotz = rotation("z", -Math.PI/180 * shape.rotz);
+	    var derotate = derotz.times(deroty).times(derotx);
+	    var worldToObj = derotate.times(detranslate);
+	    worldToObj = descale.times(worldToObj);
+	    shape.objToWorld = objToWorld;
+	    shape.worldToObj = worldToObj;
+	    shape.radius = 1;
+	    shape.center = [0, 0, 0];
+	    shape.type = "sphere";
+	} else {
+	    shape.worldToObj = matrix(4, 4);
+	    shape.objToWorld = matrix(4, 4);
+	}
+    }
     //prep the canvas
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
@@ -357,5 +382,5 @@
     ctx.putImageData(imgData, 0, 0);
     
     //profit
-
+    
 }());
