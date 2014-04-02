@@ -56,3 +56,5 @@ To run the raytracer from the command line, do:
 java raytracer.Main file1 [file2.obj]* outputfile.jpg
 
 where file1 is in the form we described above, giving a camera position and scene parameters and shapes if you want, and [file2.obj]* represents an optional list of as many .obj files as you want it to render, and outputfile.jpg is the name of the output that you want to make. Couldn't be easier! Have fun tracing rays.
+
+Also, I wrote the same thing in Javascript for kicks. Except its input objects are JSON objects with the same parameters as described above. Except there's no NormalTriangle, you just either specify the vertex normals when you specify the triangle or you don't do that. And it doesn't know about .obj files. And Javascript is not so easy to read files in so if you wanna actually run it on a file you have to write that filename in the code where it says "FILE NAME HERE". Besides that it's pretty neat. 

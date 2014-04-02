@@ -316,7 +316,7 @@
     
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "file:///home/dave/ray/js/input-30.js", false);
+    inputFile.open("GET", "FILE NAME HERE", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);
