@@ -80,13 +80,9 @@
 	    //handle reflection
 	    if (vector(inter.shape.kr).exceeds(0)) {
 		var reflectdir = (rayr.direction.normalize().times(-1).plus(inter.normal.direction.times(2 * inter.normal.direction.dot(rayr.direction.normalize())))).times(-1);
-		//console.log("before");
-		//console.dir(color);
 		color = color.plus(rt.trace(ray(inter.normal.position, reflectdir), reflections + 1).vtimes(vector(inter.shape.kr)));
-		//console.log("faftER");
-		//console.dir(color);
 	    }
-	    return color;//.times(255).floor();
+	    return color;
 	}
 	return rt;
     }
@@ -129,6 +125,7 @@
 		    }
 		}
 		if (shape.type === "triangle") {
+		    //incomprehensible sequence of operations to find intersection
 		    var ve = rayr.position;
 		    var vd = rayr.direction;
 		    var vc = vector(shape.vc);
