@@ -84,6 +84,11 @@
 	    var ret = null;
 	    for (var k = 0; k < shapes.length; k++) {
 		var shape = shapes[k];
+		if (!shape) {
+		console.log(k);
+		console.dir(shape);
+		console.dir(shapes);
+		}
 		if (shape.type === "sphere") {
 		    var emc = rayr.position.minus(vector(shape.center));
 		    var a = rayr.direction.dot(rayr.direction);
@@ -129,16 +134,16 @@
 		    var h = vd.y;
 		    var i = vd.z;
 		    var j = va.x - ve.x;
-		    var k = va.y - ve.y;
+		    var kk = va.y - ve.y;
 		    var l = va.z - ve.z;
 		    var eihf = e * i - h * f;
 		    var gfdi = g * f - d * i;
 		    var dheg = d * h - e * g;
-		    var akjb = a * k - j * b;
+		    var akjb = a * kk - j * b;
 		    var jcal = j * c - a * l;
-		    var blkc = b * l - k * c;
+		    var blkc = b * l - kk * c;
 		    var m = a * eihf + b * gfdi + c * dheg;
-		    var beta = (j * eihf + k * gfdi + l * dheg) / m;
+		    var beta = (j * eihf + kk * gfdi + l * dheg) / m;
 		    var gamma = (i * akjb + h * jcal + g * blkc) / m;
 		    var t  = -1 * (f * akjb + e * jcal + d * blkc) / m;
 		    if (t < .001 || t > tmin || gamma < 0 || gamma > 1 || beta < 0 || beta > 1-gamma) {
@@ -150,7 +155,7 @@
 			ret.normal = ray(rayr.valueAt(t), (shape.normals[0].times(1-beta-gamma).plus(shape.normals[1].times(beta)).plus(shape.normals[2].times(gamma))).normalize());
 			ret.shape = shape;
 		    } else {
-			ret.normal = ray(rayr.valueAt(t), ((shape.vb.minus(shape.va)).cross(shape.vc.minus(shape.va))).normalize());
+			ret.normal = ray(rayr.valueAt(t), ((vb.minus(va)).cross(vc.minus(va))).normalize());
 			ret.shape = shape;
 		    }
 		}
@@ -198,13 +203,16 @@
 	v.floor = function() {
 	    return vector([Math.floor(v.x), Math.floor(v.y), Math.floor(v.z)]);
 	}
+	v.cross = function(w) {
+	    return vector([v.y * w.z - v.z * w.y, v.z * w.x - v.x * w.z, v.x * w.y - v.y * w.x]);
+	}
 	return v;
     }
 
    
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "file:///home/dave/ray/js/input-00.js", false);
+    inputFile.open("GET", "file:///home/dave/ray/js/input-10.js", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);
@@ -217,7 +225,6 @@
     cam.LR = vector(cam.LR);
 
     var lights = objects["lights"];
-    var k;
 
     //prep the canvas
     var canvas = document.getElementById("myCanvas");
