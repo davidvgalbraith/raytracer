@@ -6,8 +6,8 @@
 	"LR":[ 1, -1, -3],
 	"UR":[ 1,  1, -3],
 	"UL":[-1,  1, -3],
-	"pixelsX":200,
-	"pixelsY":200
+	"pixelsX":300,
+	"pixelsY":300
     },
     "lights": [
 	{

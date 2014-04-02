@@ -17,7 +17,7 @@
 	for (x = 0; x < camera.pixelsX * camera.pixelsY * 4; x += 4) {
 	    var xfour = x / 4;
 	    var raaay = generateRay(xfour % camera.pixelsX, Math.floor(xfour / camera.pixelsX));
-	    var color = raytracer.trace(raaay, 5);
+	    var color = raytracer.trace(raaay, 0).times(255).floor();
 	    imgData.data[x] = color.x > 255 ? 255 : color.x;
 	    imgData.data[x+1] = color.y > 255 ? 255 : color.y;
 	    imgData.data[x+2] = color.z > 255 ? 255 : color.z;
@@ -46,13 +46,13 @@
 		dot = 0;
 	    }
 	    dot = Math.pow(dot, inter.shape.sp);
-	    return vector([dot * light.color[0] * inter.shape.ks[0], dot * light.color[1] * inter.shape.ks[1], dot * light.color[2] * inter.shape.ks[2]]);
+	    return vector(light.color).vtimes(vector(inter.shape.ks)).times(dot);
 	}
 	//handle diffuse shading
 	var diffuse = function(light, lightray, inter) {
 	    var l = lightray.direction.normalize();
 	    var dot = l.dot(inter.normal.direction);
-	    return vector([dot * light.color[0] * inter.shape.kd[0], dot * light.color[1] * inter.shape.kd[1], dot * light.color[2] * inter.shape.kd[2]]);
+	    return vector(light.color).vtimes(vector(inter.shape.kd)).times(dot);
 	}
 	rt.trace = function(rayr, reflections) {
 	    origin = rayr.position;
@@ -67,6 +67,9 @@
 	    var color = vector([0, 0, 0]);
 	    for (var l = 0; l < lights.length; l++) {
 		var light = lights[l];
+		if (reflections === 0) {
+		    color = color.plus(vector(inter.shape.ka).vtimes(vector(light.color)));
+		}
 		if (light.type === "directional") {
 		    var lightray = ray(inter.normal.position, vector(light.direction).times(-1));
 		    if (!shapes.intersect(lightray)) {
@@ -74,7 +77,16 @@
 		    }
 		}
 	    }
-	    return color.times(255).floor();
+	    //handle reflection
+	    if (vector(inter.shape.kr).exceeds(0)) {
+		var reflectdir = (rayr.direction.normalize().times(-1).plus(inter.normal.direction.times(2 * inter.normal.direction.dot(rayr.direction.normalize())))).times(-1);
+		//console.log("before");
+		//console.dir(color);
+		color = color.plus(rt.trace(ray(inter.normal.position, reflectdir), reflections + 1).vtimes(vector(inter.shape.kr)));
+		//console.log("faftER");
+		//console.dir(color);
+	    }
+	    return color;//.times(255).floor();
 	}
 	return rt;
     }
@@ -87,11 +99,6 @@
 	    var ret = null;
 	    for (var k = 0; k < shapes.length; k++) {
 		var shape = shapes[k];
-		if (!shape) {
-		console.log(k);
-		console.dir(shape);
-		console.dir(shapes);
-		}
 		if (shape.type === "sphere") {
 		    var emc = rayr.position.minus(vector(shape.center));
 		    var a = rayr.direction.dot(rayr.direction);
@@ -191,7 +198,10 @@
 	}
 	v.times = function(a) {
 	    return vector([a * v.x, a * v.y, a * v.z]);
-	}	
+	}
+	v.vtimes = function(w) {
+	    return vector([v.x * w.x, v.y * w.y, v.z * w.z]);
+	}
 	v.dot = function(w) {
 	    return v.x * w.x + v.y * w.y + v.z * w.z;
 	}
@@ -209,6 +219,9 @@
 	v.cross = function(w) {
 	    return vector([v.y * w.z - v.z * w.y, v.z * w.x - v.x * w.z, v.x * w.y - v.y * w.x]);
 	}
+	v.exceeds = function(a) {
+	    return v.x > a || v.y > a || v.z > a;
+	}
 	return v;
     }
 
@@ -225,7 +238,6 @@
     cam.UR = vector(cam.UR);
     cam.LL = vector(cam.LL);
     cam.LR = vector(cam.LR);
-
     var lights = objects["lights"];
 
     //prep the canvas
