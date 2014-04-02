@@ -1,3 +1,6 @@
+//a javascript raytracer
+//too slow to be useful but I like it anyway
+
 (function() {
 
     //scene and its discontents
@@ -209,7 +212,6 @@
 	return v;
     }
 
-   
     //read the input file
     var inputFile = new XMLHttpRequest();
     inputFile.open("GET", "file:///home/dave/ray/js/input-10.js", false);
