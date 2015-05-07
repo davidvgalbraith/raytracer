@@ -20,6 +20,5 @@ public class Material {
 	public void setBRDF(BRDF constantBRDF) {
 		this.constantBRDF = constantBRDF;
 	}
-	
+
 }
-   

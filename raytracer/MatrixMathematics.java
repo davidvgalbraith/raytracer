@@ -13,7 +13,7 @@ public class MatrixMathematics {
 
 	/**
 	 * Transpose of a matrix - Swap the columns with rows
-	 * 
+	 *
 	 * @param matrix
 	 * @return
 	 */
@@ -49,7 +49,7 @@ public class MatrixMathematics {
 	 * values of the inverted matrix are either NAN or Infinity Only square
 	 * matrices have inverse and the following method will throw exception if
 	 * the matrix is not square.
-	 * 
+	 *
 	 * @param matrix
 	 * @return
 	 * @throws NoSquareException
@@ -67,7 +67,7 @@ public class MatrixMathematics {
 	/**
 	 * Determinant of a square matrix The following function find the
 	 * determinant in a recursively.
-	 * 
+	 *
 	 * @param matrix
 	 * @return
 	 * @throws NoSquareException
@@ -93,7 +93,7 @@ public class MatrixMathematics {
 
 	/**
 	 * Determine the sign; i.e. even numbers have sign + and odds -
-	 * 
+	 *
 	 * @param i
 	 * @return
 	 */
@@ -105,7 +105,7 @@ public class MatrixMathematics {
 
 	/**
 	 * Creates a submatrix excluding the given row and column
-	 * 
+	 *
 	 * @param matrix
 	 * @param excluding_row
 	 * @param excluding_col
@@ -131,7 +131,7 @@ public class MatrixMathematics {
 
 	/**
 	 * The cofactor of a matrix
-	 * 
+	 *
 	 * @param matrix
 	 * @return
 	 * @throws NoSquareException
@@ -150,7 +150,7 @@ public class MatrixMathematics {
 
 	/**
 	 * Adds two matrices of the same dimension
-	 * 
+	 *
 	 * @param matrix1
 	 * @param matrix2
 	 * @return
@@ -175,7 +175,7 @@ public class MatrixMathematics {
 	/**
 	 * subtract two matrices using the above addition method. Matrices should be
 	 * the same dimension.
-	 * 
+	 *
 	 * @param matrix1
 	 * @param matrix2
 	 * @return
@@ -188,7 +188,7 @@ public class MatrixMathematics {
 
 	/**
 	 * Multiply two matrices
-	 * 
+	 *
 	 * @param matrix1
 	 * @param matrix2
 	 * @return
@@ -209,4 +209,3 @@ public class MatrixMathematics {
 		return multipliedMatrix;
 	}
 }
-   

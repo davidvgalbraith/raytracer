@@ -31,4 +31,3 @@ public class Garbage {
 		return d;
 	}
 }
-   

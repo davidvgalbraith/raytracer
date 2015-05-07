@@ -19,10 +19,9 @@ public class DirectionalLight implements Light {
 		lray.setTmax(Double.MAX_VALUE);
 		col.setAll(color);
 	}
-	
+
 	public String toString() {
 		return "Directional light, " + color + " direction: " + direction;
 	}
 
 }
-   

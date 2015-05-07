@@ -34,9 +34,8 @@ public class Camera {
 		Point p = new Point(pv.getX(), pv.getY(), pv.getZ());
 		ray.setDir(p.minus(eyepos));
 	}
-	
+
 	public String toString() {
 		return "Camera\n Eyepos: " + eyepos + "\n ll " + ll + "\n ul " + ul + "\n lr " + lr + "\n ur " + ur;
 	}
 }
-   

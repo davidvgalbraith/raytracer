@@ -6,7 +6,7 @@ import java.io.IOException;
 public class Film {
 	int[][] picture;
 	String name;
-	
+
 	public Film(int width, int height, String name) {
 		picture = new int[height][width];
 		this.name = name;
@@ -20,7 +20,7 @@ public class Film {
 		picture[row][col] = (255 << 24 ) | (red << 16 ) | (green <<  8) | blue;
 	}
 	void writeImage() {
-		
+
 		BufferedImage image = ImageExport.convertRGBImageWithHeader(picture,"Iteration: 1");
 		try {
 			ImageExport.exportImageToFile(name,image);
@@ -29,4 +29,3 @@ public class Film {
 		}
 	}
 }
-   

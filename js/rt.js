@@ -85,7 +85,7 @@
 	}
 	return rt;
     }
-    
+
     var shapeobject = function(shapes) {
 	var o = {};
 	//returns a ray normal to the surface of closest intersection
@@ -102,7 +102,7 @@
 		    var a = transray.direction.dot(transray.direction);
 		    var b = 2 * transray.direction.dot(emc);
 		    var c = emc.dot(emc) - shape.radius * shape.radius;
-		    var disc = b * b - 4 * a * c;		    		 
+		    var disc = b * b - 4 * a * c;
 		    if (disc < 0) {
 			continue;
 		    }
@@ -121,7 +121,7 @@
 			ret = {};
 		    }
 		    if (thit < tmin) {
-			tmin = thit; 
+			tmin = thit;
 			ret.normal = ray(shape.objToWorld.homomult(transray.valueAt(thit), 1), shape.worldToObj.transpose().homomult(transray.valueAt(thit).minus(vector(shape.center)), 0).normalize());
 			ret.shape = shape;
 		    }
@@ -270,7 +270,7 @@
 		return vector([result[0], result[1], result[2]]);
 	    }
 	}
-	m.transpose = function() { 
+	m.transpose = function() {
 	    var i, j;
 	    var ret = matrix(m.colums, m.rows);
 	    for (i = 0; i < m.rows; i++) {
@@ -313,14 +313,14 @@
 	}
 	return result;
     }
-    
+
     //read the input file
     var inputFile = new XMLHttpRequest();
     inputFile.open("GET", "FILE NAME HERE", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);
-    
+
     //parse the input file
     var cam = objects["camera"];
     cam.UL = vector(cam.UL);
@@ -379,7 +379,7 @@
     var rayt = raytracer(shapes, lights, cam.eye, 5);
     var picture = scene(cam, rayt, imgData);
     ctx.putImageData(imgData, 0, 0);
-    
+
     //profit
-    
+
 }());

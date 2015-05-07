@@ -16,7 +16,7 @@ public class GeometricPrimitive implements Primitive {
 	public String toString() {
 		return shape + " transformed by " + worldToObj;
 	}
-	
+
 	@Override
 	public boolean intersect(Ray ray, Doublet thit, Intersection in) {
 		Ray oray = worldToObj.transform(ray);
@@ -31,15 +31,14 @@ public class GeometricPrimitive implements Primitive {
 
 	@Override
 	public boolean intersectP(Ray ray) {
-		
+
 		Ray oray = worldToObj.transform(ray);
 		return shape.intersectP(oray);
 	}
 
 	@Override
 	public void getBRDF(LocalGeo local, BRDF brdf) {
-		mat.getBRDF(local, brdf); 
+		mat.getBRDF(local, brdf);
 	}
 
 }
-   

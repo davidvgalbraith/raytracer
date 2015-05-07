@@ -19,4 +19,3 @@ public class NoSquareException extends Exception {
 	}
 
 }
-   

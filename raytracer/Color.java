@@ -9,14 +9,14 @@ public class Color {
 		}
 		if (g > 1.0) {
 			g = 1.0;
-		}		
+		}
 		if (b > 1.0) {
 			b = 1.0;
 		}
 		if (r < 0) {
 			System.err.println("Tried to make color with negetive r");
 			System.exit(1);
-		}		
+		}
 		if (g < 0) {
 			System.err.println("Tried to make color with negetive g");
 			System.exit(1);
@@ -94,11 +94,10 @@ public class Color {
 	public String toString() {
 		return "((Color) (" + r + "," + g + "," + b + "))";
 	}
-	
+
 	public void setAll(Color a) {
 		this.r = a.getR();
 		this.g = a.getG();
 		this.b = a.getB();
 	}
 }
-   

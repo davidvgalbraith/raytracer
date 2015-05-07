@@ -36,7 +36,7 @@ public class Triangle implements Shape {
 		Vector norm1 = ((vb.minus(va)).cross((vc.minus(va)))).normalize();
 		local.setNormal(new Normal(norm1.getX(), norm1.getY(), norm1.getZ()));
 		return true;
-		
+
 	}
 
 	public Triangle(Vector va, Vector vb, Vector vc) {
@@ -85,4 +85,3 @@ public class Triangle implements Shape {
 		return true;
 	}
 }
-   

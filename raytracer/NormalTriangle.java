@@ -40,7 +40,7 @@ public class NormalTriangle implements Shape {
 		Normal n = none.times(1-beta-gamma).plus(ntwo.times(beta)).plus(nthree.times(gamma)).normalate();
 		local.setNormal(n);
 		return true;
-		
+
 	}
 
 	public NormalTriangle(Vector va, Vector vb, Vector vc, Normal n1, Normal n2, Normal n3) {
@@ -93,4 +93,3 @@ public class NormalTriangle implements Shape {
 	}
 
 }
-   

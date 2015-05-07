@@ -25,8 +25,7 @@ public class Scene {
 		}
 		film.writeImage();
 	}
-	
-	
+
+
 
 }
-   

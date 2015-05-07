@@ -14,7 +14,7 @@ public class ImageExport {
 
     /**
      * Export an image to a JPG file
-     * 
+     *
      * @param fileName The filename to export to
      * @param image The image to write to file
      * @throws IOException If problems occur during writing of file
@@ -30,7 +30,7 @@ public class ImageExport {
      * The ints are expected to be calculated using
      * int color = (255 << 24 ) | (red << 16 ) | (green <<  8) | blue;
      * where red,green and blue are values in [0-255]
-     * 
+     *
      * @param rgbValue The two dimensional int array representing the pixels
      * @return A BufferedImage with all the pixels drawn
      */
@@ -42,10 +42,10 @@ public class ImageExport {
         //we either have to loop through all values, or convert to 1-d array
         for(int y=0; y< height; y++){
             for(int x=0; x< width; x++){
-                bufferedImage.setRGB(x,y,rgbValue[y][x]);  
+                bufferedImage.setRGB(x,y,rgbValue[y][x]);
             }
         }
-        return bufferedImage;  
+        return bufferedImage;
     }
     /**
      * Convert a two dimensional array of ints to a BufferedImage.
@@ -53,10 +53,10 @@ public class ImageExport {
      * The ints are expected to be calculated using
      * int color = (255 << 24 ) | (red << 16 ) | (green <<  8) | blue;
      * where red,green and blue are values in [0-255]
-     * 
+     *
      * In addition this also draws a header text in white colour on a back background.
      * This increases the height of the image.
-     * 
+     *
      * @param rgbValue The two dimensional int array representing the pixels
      * @param strHeader The text to draw at the top of the image
      * @return A BufferedImage with all the pixels drawn
@@ -71,7 +71,7 @@ public class ImageExport {
         //we either have to loop through all values, or convert to 1-d array
         for(int y=headerHeight; y< height; y++){
             for(int x=0; x< width; x++){
-                bufferedImage.setRGB(x,y,rgbValue[y-headerHeight][x]);  
+                bufferedImage.setRGB(x,y,rgbValue[y-headerHeight][x]);
             }
         }
         //Draw the text
@@ -80,6 +80,6 @@ public class ImageExport {
         g.setColor(Color.white);
         //g.drawString(strHeader,0,10);
 
-        return bufferedImage;  
+        return bufferedImage;
     }
-}   
+}

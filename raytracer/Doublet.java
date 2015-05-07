@@ -14,6 +14,5 @@ public class Doublet {
 	public Doublet(double d) {
 		this.d = d;
 	}
-	
+
 }
-   

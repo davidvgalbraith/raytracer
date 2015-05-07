@@ -32,7 +32,7 @@ public class Matrix {
 		}
 		return s;
 	}
-	
+
 	public int getNrows() {
 		return nrows;
 	}
@@ -90,9 +90,9 @@ public class Matrix {
 			for (int j=0;j<X_.getNcols();j++) {
 				if (j==0)
 					X_.setValueAt(i, j, 1.0);
-				else 
+				else
 					X_.setValueAt(i, j, this.getValueAt(i, j-1));
-				
+
 			}
 		}
 		return X_;
@@ -110,4 +110,3 @@ public class Matrix {
 		return res;
 	}
 }
-   

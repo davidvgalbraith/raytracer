@@ -81,10 +81,9 @@ public class Ray {
 	public void setTmax(double tmax) {
 		this.tmax = tmax;
 	}
-	
+
 	public String toString() {
 		return "a ray from " + pos + " going " + dir;
 	}
 
 }
-   

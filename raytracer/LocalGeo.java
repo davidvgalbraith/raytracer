@@ -23,7 +23,7 @@ public class LocalGeo {
 		this.y = 0;
 		this.z = 0;
 	}
-	
+
 	public Point getPos() {
 		return pos;
 	}
@@ -65,4 +65,3 @@ public class LocalGeo {
 		this.z = z;
 	}
 }
-   

@@ -16,11 +16,11 @@ public class Normal {
 			this.z = z/norm;
 		}
 	}
-	
+
 	public String toString() {
 		return "Normal: " + x + ", " + y + ", " + z;
 	}
-	
+
 	public static Normal normalize(Vector a) {
 		return new Normal(a.getX(), a.getY(), a.getZ());
 	}
@@ -31,11 +31,11 @@ public class Normal {
 	public Normal minus(Normal a) {
 		return new Normal(x - a.getX(), y - a.getY(), z - a.getZ());
 	}
-	
+
 	public Vector vectorize() {
 		return new Vector(x, y, z);
 	}
-	
+
 	public double getX() {
 		return x;
 	}
@@ -59,6 +59,5 @@ public class Normal {
 	public void setZ(double z) {
 		this.z = z;
 	}
-	
+
 }
-   

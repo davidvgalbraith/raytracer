@@ -30,7 +30,7 @@ kd=[ kdx kdy kdz ]
 ks=[ ksx ksy ksz ]
 kr=[ krx kry krz ]
 
-where x y z is the position of the center, r is the radius, and ka, kd, ks, and kr specify the BRDF of your sphere. Then there's two types of triangles you can have. The first type of triangle looks like this: 
+where x y z is the position of the center, r is the radius, and ka, kd, ks, and kr specify the BRDF of your sphere. Then there's two types of triangles you can have. The first type of triangle looks like this:
 
 Triangle with v1=[  x1  y1  z1 ] v2=[  x2 y2 z2 ] v3=[ x3 y3 z3 ]
 ka=[ kax kay kaz ]
@@ -47,9 +47,9 @@ ks=[ ksx ksy ksz ]
 kr=[ krx kry krz ]
 n1=[ n1x n1y n1z ] n2=[ n2x n2y n2z ] n3=[ n3x n3y n3z ]
 
-where n1, n2, and n3 are the vertex normals at v1, v2, and v3. 
+where n1, n2, and n3 are the vertex normals at v1, v2, and v3.
 
-Besides this input format, the raytracer can read and draw simple .obj files, as long as the faces are only triangular and are specified in terms of only vertices or vertices and vertex normals (no "texture vertices"). It can read as many .obj files as you want, although I don't guarantee that the images won't overlap. 
+Besides this input format, the raytracer can read and draw simple .obj files, as long as the faces are only triangular and are specified in terms of only vertices or vertices and vertex normals (no "texture vertices"). It can read as many .obj files as you want, although I don't guarantee that the images won't overlap.
 
 To run the raytracer from the command line, do:
 
@@ -57,4 +57,4 @@ java raytracer.Main file1 [file2.obj]* outputfile.jpg
 
 where file1 is in the form we described above, giving a camera position and scene parameters and shapes if you want, and [file2.obj]* represents an optional list of as many .obj files as you want it to render, and outputfile.jpg is the name of the output that you want to make. Couldn't be easier! Have fun tracing rays.
 
-Also, I wrote the same thing in Javascript for kicks. Except its input objects are JSON objects with the same parameters as described above. Except there's no NormalTriangle, you just either specify the vertex normals when you specify the triangle or you don't do that. And it doesn't know about .obj files. And Javascript is not so easy to read files in so if you wanna actually run it on a file you have to write that filename in the code where it says "FILE NAME HERE". Besides that it's pretty neat. 
+Also, I wrote the same thing in Javascript for kicks. Except its input objects are JSON objects with the same parameters as described above. Except there's no NormalTriangle, you just either specify the vertex normals when you specify the triangle or you don't do that. And it doesn't know about .obj files. And Javascript is not so easy to read files in so if you wanna actually run it on a file you have to write that filename in the code where it says "FILE NAME HERE". Besides that it's pretty neat.
