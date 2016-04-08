@@ -87,101 +87,99 @@
     }
 
     var shapeobject = function(shapes) {
-        var o = {};
-        //returns a ray normal to the surface of closest intersection
-        o.intersect = function(rayr) {
-            var tmin = Infinity;
-            var ret = null;
-            for (var k = 0; k < shapes.length; k++) {
-                var shape = shapes[k];
-                var tpos = shape.worldToObj.homomult(rayr.position, 1);
-                var tdir = shape.worldToObj.homomult(rayr.direction, 0);
-                var transray = ray(tpos, tdir);
-                if (shape.type === "sphere") {
-                    var emc = transray.position.minus(vector(shape.center));
-                    var a = transray.direction.dot(transray.direction);
-                    var b = 2 * transray.direction.dot(emc);
-                    var c = emc.dot(emc) - shape.radius * shape.radius;
-                    var disc = b * b - 4 * a * c;
-                    if (disc < 0) {
-                        continue;
+        return {
+            //returns a ray normal to the surface of closest intersection
+            intersect: function(rayr) {
+                var tmin = Infinity;
+                var ret = null;
+                for (var k = 0; k < shapes.length; k++) {
+                    var shape = shapes[k];
+                    var tpos = shape.worldToObj.homomult(rayr.position, 1);
+                    var tdir = shape.worldToObj.homomult(rayr.direction, 0);
+                    var transray = ray(tpos, tdir);
+                    if (shape.type === "sphere") {
+                        var emc = transray.position.minus(vector(shape.center));
+                        var a = transray.direction.dot(transray.direction);
+                        var b = 2 * transray.direction.dot(emc);
+                        var c = emc.dot(emc) - shape.radius * shape.radius;
+                        var disc = b * b - 4 * a * c;
+                        if (disc < 0) {
+                            continue;
+                        }
+                        var t1 = (-1 * b + Math.sqrt(disc)) / (2 * a);
+                        var t2 = (-1 * b - Math.sqrt(disc)) / (2 * a);
+                        var thit;
+                        if (t1 < 0.001 && t2 < 0.001) {
+                            continue;
+                        }
+                        if (t1 > 0.001 && t2 < 0.001) {
+                            thit = t1;
+                        } else {
+                            thit = t2;
+                        }
+                        if (thit < tmin) {
+                            ret = ret || {};
+                            tmin = thit;
+                            ret.normal = ray(shape.objToWorld.homomult(transray.valueAt(thit), 1), shape.worldToObj.transpose().homomult(transray.valueAt(thit).minus(vector(shape.center)), 0).normalize());
+                            ret.shape = shape;
+                        }
                     }
-                    var t1 = (-1 * b + Math.sqrt(disc)) / (2 * a);
-                    var t2 = (-1 * b - Math.sqrt(disc)) / (2 * a);
-                    var thit;
-                    if (t1 < 0.001 && t2 < 0.001) {
-                        continue;
-                    }
-                    if (t1 > 0.001 && t2 < 0.001) {
-                        thit = t1;
-                    } else {
-                        thit = t2;
-                    }
-                    if (thit < tmin && !ret) {
+                    if (shape.type === "triangle") {
+                        //incomprehensible sequence of operations to find intersection
+                        var ve = transray.position;
+                        var vd = transray.direction;
+                        var vc = vector(shape.vc);
+                        var vb = vector(shape.vb);
+                        var va = vector(shape.va);
+                        var a = va.x - vb.x;
+                        var b = va.y - vb.y;
+                        var c = va.z - vb.z;
+                        var d = va.x - vc.x;
+                        var e = va.y - vc.y;
+                        var f = va.z - vc.z;
+                        var g = vd.x;
+                        var h = vd.y;
+                        var i = vd.z;
+                        var j = va.x - ve.x;
+                        var kk = va.y - ve.y;
+                        var l = va.z - ve.z;
+                        var eihf = e * i - h * f;
+                        var gfdi = g * f - d * i;
+                        var dheg = d * h - e * g;
+                        var akjb = a * kk - j * b;
+                        var jcal = j * c - a * l;
+                        var blkc = b * l - kk * c;
+                        var m = a * eihf + b * gfdi + c * dheg;
+                        var beta = (j * eihf + kk * gfdi + l * dheg) / m;
+                        var gamma = (i * akjb + h * jcal + g * blkc) / m;
+                        var t  = -1 * (f * akjb + e * jcal + d * blkc) / m;
+                        if (t < .001 || t > tmin || gamma < 0 || gamma > 1 || beta < 0 || beta > 1-gamma) {
+                            continue;
+                        }
                         ret = {};
-                    }
-                    if (thit < tmin) {
-                        tmin = thit;
-                        ret.normal = ray(shape.objToWorld.homomult(transray.valueAt(thit), 1), shape.worldToObj.transpose().homomult(transray.valueAt(thit).minus(vector(shape.center)), 0).normalize());
-                        ret.shape = shape;
-                    }
-                }
-                if (shape.type === "triangle") {
-                    //incomprehensible sequence of operations to find intersection
-                    var ve = transray.position;
-                    var vd = transray.direction;
-                    var vc = vector(shape.vc);
-                    var vb = vector(shape.vb);
-                    var va = vector(shape.va);
-                    var a = va.x - vb.x;
-                    var b = va.y - vb.y;
-                    var c = va.z - vb.z;
-                    var d = va.x - vc.x;
-                    var e = va.y - vc.y;
-                    var f = va.z - vc.z;
-                    var g = vd.x;
-                    var h = vd.y;
-                    var i = vd.z;
-                    var j = va.x - ve.x;
-                    var kk = va.y - ve.y;
-                    var l = va.z - ve.z;
-                    var eihf = e * i - h * f;
-                    var gfdi = g * f - d * i;
-                    var dheg = d * h - e * g;
-                    var akjb = a * kk - j * b;
-                    var jcal = j * c - a * l;
-                    var blkc = b * l - kk * c;
-                    var m = a * eihf + b * gfdi + c * dheg;
-                    var beta = (j * eihf + kk * gfdi + l * dheg) / m;
-                    var gamma = (i * akjb + h * jcal + g * blkc) / m;
-                    var t  = -1 * (f * akjb + e * jcal + d * blkc) / m;
-                    if (t < .001 || t > tmin || gamma < 0 || gamma > 1 || beta < 0 || beta > 1-gamma) {
-                        continue;
-                    }
-                    ret = {};
-                    tmin = t;
-                    if (shape.normals) {
-                        ret.normal = ray(transray.valueAt(t), (shape.normals[0].times(1-beta-gamma).plus(shape.normals[1].times(beta)).plus(shape.normals[2].times(gamma))).normalize());
-                        ret.shape = shape;
-                    } else {
-                        ret.normal = ray(transray.valueAt(t), ((vb.minus(va)).cross(vc.minus(va))).normalize());
-                        ret.shape = shape;
+                        tmin = t;
+                        if (shape.normals) {
+                            ret.normal = ray(transray.valueAt(t), (shape.normals[0].times(1-beta-gamma).plus(shape.normals[1].times(beta)).plus(shape.normals[2].times(gamma))).normalize());
+                            ret.shape = shape;
+                        } else {
+                            ret.normal = ray(transray.valueAt(t), ((vb.minus(va)).cross(vc.minus(va))).normalize());
+                            ret.shape = shape;
+                        }
                     }
                 }
+                return ret;
             }
-            return ret;
-        }
-        return o;
+        };
     }
 
     var ray = function(position, direction) {
-        r = {};
-        r.position = position;
-        r.direction = direction;
-        r.valueAt = function(t) {
-            return position.plus(direction.times(t));
-        }
-        return r;
+        return {
+            position: position,
+            direction: direction,
+            valueAt: function(t) {
+                return position.plus(direction.times(t));
+            }
+        };
     }
 
     var vector = function(coordinates) {
@@ -316,7 +314,7 @@
 
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "input-30.js", false);
+    inputFile.open("GET", "input-10.js", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);
