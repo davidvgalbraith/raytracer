@@ -11,7 +11,7 @@
             var xpos = camera.UL.x + (x / camera.pixelsX) * (camera.UR.x - camera.UL.x) + 1 / (2 * camera.pixelsX);
             var ypos = camera.UL.y + (y / camera.pixelsY) * (camera.LL.y - camera.UL.y) + 1 / (2 * camera.pixelsY);
             var screenpos = vector([xpos, ypos, camera.UL.z]);
-            return ray(vector(camera.eye), screenpos);
+            return ray(vector(camera.origin), screenpos);
         }
         for (x = 0; x < camera.pixelsX * camera.pixelsY * 4; x += 4) {
             var xfour = x / 4;
@@ -314,7 +314,7 @@
 
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "input-10.js", false);
+    inputFile.open("GET", "http://localhost:12345/input-30", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);
@@ -374,7 +374,7 @@
 
     //draw the picture
     var shapes = shapeobject(objects["shapes"]);
-    var rayt = raytracer(shapes, lights, cam.eye, 5);
+    var rayt = raytracer(shapes, lights, cam.origin, 5);
     var picture = scene(cam, rayt, imgData);
     ctx.putImageData(imgData, 0, 0);
 

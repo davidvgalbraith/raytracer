@@ -1,0 +1,26 @@
+{
+  "name": "y",
+  "version": "1.0.0",
+  "description": "This here is a 3d geometric ray tracer implemented in Java. You kinda have to know about graphics to use it, sorry. So basically to use it you've gotta give it some input. That input comes in the form of a file. Your file should have a line that looks like:",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidvgalbraith/raytracer.git"
+  },
+  "author": "davidvgalbraith",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/davidvgalbraith/raytracer/issues"
+  },
+  "homepage": "https://github.com/davidvgalbraith/raytracer#readme",
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "express": "^4.13.4"
+  }
+}
