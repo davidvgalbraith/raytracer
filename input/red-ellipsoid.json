@@ -27,12 +27,16 @@
         {
             "type":"ellipsoid",
             "center":[  0, 0, -17 ],
-            "rx":4.0,
-            "ry":2.0,
-            "rz":2.0,
-            "rotx":0,
-            "roty":-45,
-            "rotz":45,
+            "radii": {
+                "x":4.0,
+                "y":2.0,
+                "z":2.0
+            },
+            "rotation": {
+                "x":0,
+                "y":-45,
+                "z":45
+            },
             "shading": {
                 "ambient":[ 0.1,  0.1,  0.1 ],
                 "diffuse":[ 1,  0,  0 ],

@@ -27,12 +27,16 @@
         {
             "type":"ellipsoid",
             "center":[  0, 0, -17 ],
-            "rx":4.0,
-            "ry":2.0,
-            "rz":2.0,
-            "rotx":0,
-            "roty":0,
-            "rotz":0,
+            "radii": {
+                "x":4.0,
+                "y":2.0,
+                "z":2.0
+            },
+            "rotation": {
+                "x":0,
+                "y":0,
+                "z":0
+            },
             "shading": {
                 "ambient":[ 0.1,  0.1,  0.1 ],
                 "diffuse":[ 1,  0,  0 ],
@@ -44,12 +48,16 @@
         {
             "type":"ellipsoid",
             "center":[  -2, 4, -17 ],
-            "rx":0.5,
-            "ry":1.5,
-            "rz":1.0,
-            "rotx":0,
-            "roty":-45,
-            "rotz":-45,
+            "radii": {
+                "x": 0.5,
+                "y": 1.5,
+                "z": 1.0
+            },
+            "rotation": {
+                "x":0,
+                "y":-45,
+                "z":-45
+            },
             "shading": {
                 "ambient":[ 0.1,  0.1,  0.1 ],
                 "diffuse":[ 0,  1,  0 ],
@@ -61,12 +69,16 @@
         {
             "type":"ellipsoid",
             "center":[  -2, -4, -17 ],
-            "rx":0.5,
-            "ry":1.5,
-            "rz":1.0,
-            "rotx":0,
-            "roty":-45,
-            "rotz":45,
+            "radii": {
+                "x":0.5,
+                "y":1.5,
+                "z":1.0
+            },
+            "rotation": {
+                "x":0,
+                "y":-45,
+                "z":45
+            },
             "shading": {
                 "ambient":[ 0.1,  0.1,  0.1 ],
                 "diffuse":[ 0,  0,  1 ],
@@ -78,12 +90,16 @@
         {
             "type":"ellipsoid",
             "center":[  2, 4, -17 ],
-            "rx":0.5,
-            "ry":1.5,
-            "rz":1.0,
-            "rotx":0,
-            "roty":45,
-            "rotz":-135,
+            "radii": {
+                "x":0.5,
+                "y":1.5,
+                "z":1.0
+            },
+            "rotation": {
+                "x":0,
+                "y":45,
+                "z":-135
+            },
             "shading": {
                 "ambient":[ 0.1,  0.1,  0.1 ],
                 "diffuse":[ 1,  1,  0 ],
@@ -95,12 +111,16 @@
         {
             "type":"ellipsoid",
             "center":[  2, -4, -17 ],
-            "rx":0.5,
-            "ry":1.5,
-            "rz":1.0,
-            "rotx":0,
-            "roty":45,
-            "rotz":135,
+            "radii": {
+                "x":0.5,
+                "y":1.5,
+                "z":1.0
+            },
+            "rotation": {
+                "x":0,
+                "y":45,
+                "z":135
+            },
             "shading": {
                 "ambient":[ 0.1,  0.1,  0.1 ],
                 "diffuse":[ 0, 1, 1 ],
