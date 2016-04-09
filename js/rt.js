@@ -29,29 +29,30 @@
         var rt = {};
         var origin;
         //calculate the color given the normal vector and the light source
-        var shade = function(light, lightray, inter) {
-            var spec = speculate(light, lightray, inter);
-            var diff = diffuse(light, lightray, inter);
+        var shade = function(light, lightray, collision) {
+            var spec = speculate(light, lightray, collision);
+            var diff = diffuse(light, lightray, collision);
             return spec.plus(diff);
         }
         //handle specular shading
-        var speculate = function(light, lightray, inter) {
+        var speculate = function(light, lightray, collision) {
             var l = lightray.direction.normalize();
-            var n = inter.normal.direction;
+            var n = collision.normal.direction;
             var r = l.times(-1).plus(n.times(2 * n.dot(l))).normalize();
-            var v = origin.minus(inter.normal.position).normalize();
-            var dot = r.dot(v);
-            if (dot < 0) {
-                dot = 0;
-            }
-            dot = Math.pow(dot, inter.shape.sp);
-            return vector(light.color).vtimes(vector(inter.shape.ks)).times(dot);
+            var v = origin.minus(collision.normal.position).normalize();
+            var ks = vector(collision.shape.shading.specular);
+            var sp = collision.shape.shading.specular_exponent;
+            var dot = Math.max(r.dot(v), 0);
+            dot = Math.pow(dot, sp);
+
+            return vector(light.color).vtimes(ks).times(dot);
         }
         //handle diffuse shading
-        var diffuse = function(light, lightray, inter) {
+        var diffuse = function(light, lightray, collision) {
             var l = lightray.direction.normalize();
-            var dot = l.dot(inter.normal.direction);
-            return vector(light.color).vtimes(vector(inter.shape.kd)).times(dot);
+            var dot = l.dot(collision.normal.direction);
+            var kd = vector(collision.shape.shading.diffuse);
+            return vector(light.color).vtimes(kd).times(dot);
         }
         rt.trace = function(rayr, reflections) {
             origin = rayr.position;
@@ -59,27 +60,29 @@
                 return vector([0, 0, 0]);
             }
             //surface normal and shape or null
-            var inter = shapes.intersect(rayr);
-            if (!inter) {
+            var collision = shapes.intersect(rayr);
+            if (!collision) {
                 return vector([0, 0, 0]);
             }
             var color = vector([0, 0, 0]);
+            var ka = collision.shape.shading.ambient;
             for (var l = 0; l < lights.length; l++) {
                 var light = lights[l];
                 if (reflections === 0) {
-                    color = color.plus(vector(inter.shape.ka).vtimes(vector(light.color)));
+                    color = color.plus(vector(ka).vtimes(vector(light.color)));
                 }
                 if (light.type === "directional") {
-                    var lightray = ray(inter.normal.position, vector(light.direction).times(-1));
+                    var lightray = ray(collision.normal.position, vector(light.direction).times(-1));
                     if (!shapes.intersect(lightray)) {
-                        color = color.plus(shade(light, lightray, inter));
+                        color = color.plus(shade(light, lightray, collision));
                     }
                 }
             }
             //handle reflection
-            if (vector(inter.shape.kr).exceeds(0)) {
-                var reflectdir = (rayr.direction.normalize().times(-1).plus(inter.normal.direction.times(2 * inter.normal.direction.dot(rayr.direction.normalize())))).times(-1);
-                color = color.plus(rt.trace(ray(inter.normal.position, reflectdir), reflections + 1).vtimes(vector(inter.shape.kr)));
+            var kr = vector(collision.shape.shading.reflection);
+            if (kr.exceeds(0)) {
+                var reflectdir = (rayr.direction.normalize().times(-1).plus(collision.normal.direction.times(2 * collision.normal.direction.dot(rayr.direction.normalize())))).times(-1);
+                color = color.plus(rt.trace(ray(collision.normal.position, reflectdir), reflections + 1).vtimes(kr));
             }
             return color;
         }
@@ -314,17 +317,18 @@
 
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "http://localhost:12345/input-30", false);
+    inputFile.open("GET", "http://localhost:12345/three-circles-and-triangle", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
+    console.error(inputFile.responseText)
     var objects = JSON.parse(inputFile.responseText);
 
     //parse the input file
     var cam = objects["camera"];
-    cam.UL = vector(cam.UL);
-    cam.UR = vector(cam.UR);
-    cam.LL = vector(cam.LL);
-    cam.LR = vector(cam.LR);
+    cam.UL = vector(cam.view_plane.upper_left);
+    cam.UR = vector(cam.view_plane.upper_right);
+    cam.LL = vector(cam.view_plane.lower_left);
+    cam.LR = vector(cam.view_plane.lower_right);
     var lights = objects["lights"];
     for (var shapeIndex = 0; shapeIndex < objects["shapes"].length; shapeIndex++) {
         var shape = objects["shapes"][shapeIndex];
