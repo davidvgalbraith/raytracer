@@ -317,10 +317,9 @@
 
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "http://localhost:12345/three-circles-and-triangle", false);
+    inputFile.open("GET", "http://localhost:12345/red-circle", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
-    console.error(inputFile.responseText)
     var objects = JSON.parse(inputFile.responseText);
 
     //parse the input file
@@ -328,7 +327,6 @@
     cam.UL = vector(cam.view_plane.upper_left);
     cam.UR = vector(cam.view_plane.upper_right);
     cam.LL = vector(cam.view_plane.lower_left);
-    cam.LR = vector(cam.view_plane.lower_right);
     var lights = objects["lights"];
     for (var shapeIndex = 0; shapeIndex < objects["shapes"].length; shapeIndex++) {
         var shape = objects["shapes"][shapeIndex];

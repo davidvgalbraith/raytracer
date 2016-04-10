@@ -65,36 +65,66 @@ type Scene struct {
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		println("specify a JSON file containing a scene")
-		return
-	}
-	file := os.Args[1]
-	println(file)
-	configFile, err := os.Open(file)
-	if err != nil {
-		println("opening config file", err.Error())
-		return
-	}
-
-	jsonParser := json.NewDecoder(configFile)
-	var scene Scene
-	if err = jsonParser.Decode(&scene); err != nil {
-		println("parsing config file", err.Error())
-		return
-	}
-
-	fmt.Printf("%+v\n", scene)
+	fmt.Printf("")
+	scene := getScene()
 	var img = image.NewRGBA(image.Rect(0, 0, scene.Camera.PixelsX, scene.Camera.PixelsY))
-	b := img.Bounds()
-	for y := b.Min.Y; y < b.Max.Y; y++ {
-		for x := b.Min.X; x < b.Max.X; x++ {
-			var col = color.RGBA{0, 255, 0, 255}
+	bounds := img.Bounds()
+
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			var col = calculateColor(scene, x, y)
 			img.Set(x, y, col)
 		}
 	}
 
 	writeImage(img)
+}
+
+func calculateColor(scene Scene, x, y int) color.RGBA {
+	fx := float64(x)
+	fy := float64(y)
+	camera := scene.Camera
+	pixelsX := float64(camera.PixelsX)
+	pixelsY := float64(camera.PixelsY)
+	viewPlane := camera.ViewPlane
+
+	ul := buildVector(viewPlane.Upper_Left)
+	ur := buildVector(viewPlane.Upper_Right)
+	ll := buildVector(viewPlane.Lower_Left)
+
+	xpos := ul.x + (fx / pixelsX) * (ur.x - ul.x) + 1.0 / (2 * pixelsX)
+	ypos := ul.y + (fy / pixelsY) * (ll.y - ul.y) + 1.0 / (2 * pixelsY)
+
+	return color.RGBA{0, 255, 0, 255}
+}
+
+func buildVector(elements []float64) Vector {
+	return Vector{
+		x: elements[0],
+		y: elements[1],
+		z: elements[2],
+	}
+}
+
+func getScene() Scene {
+	if len(os.Args) < 2 {
+		panic("specify a JSON file containing a scene")
+	}
+	file := os.Args[1]
+	configFile, err := os.Open(file)
+	panick(err)
+
+	jsonParser := json.NewDecoder(configFile)
+	var scene Scene
+	panick(jsonParser.Decode(&scene))
+
+	return scene
+}
+
+func panick(err error) {
+	if (err != nil) {
+		panic(err)
+	}
 }
 
 func writeImage(img *image.RGBA) {
