@@ -3,6 +3,9 @@ package main
 import (
     "encoding/json"
 	"fmt"
+	"image"
+	"image/color"
+	"image/png"
 	"os"
 )
 
@@ -76,14 +79,29 @@ func main() {
 
 	jsonParser := json.NewDecoder(configFile)
 	var scene Scene
-	// var scene map[string]interface{}
 	if err = jsonParser.Decode(&scene); err != nil {
 		println("parsing config file", err.Error())
 		return
 	}
 
 	fmt.Printf("%+v\n", scene)
-	// println("call 91 now")
-	// camera := scene["camera"].(map[string] interface{})
-	// fmt.Printf("%+v\n", camera)
+	var img = image.NewRGBA(image.Rect(0, 0, scene.Camera.PixelsX, scene.Camera.PixelsY))
+	b := img.Bounds()
+	for y := b.Min.Y; y < b.Max.Y; y++ {
+		for x := b.Min.X; x < b.Max.X; x++ {
+			var col = color.RGBA{0, 255, 0, 255}
+			img.Set(x, y, col)
+		}
+	}
+
+	writeImage(img)
+}
+
+func writeImage(img *image.RGBA) {
+	f, err := os.Create("draww.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	png.Encode(f, img)
 }
