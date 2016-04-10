@@ -1,7 +1,7 @@
 {
   "name": "y",
   "version": "1.0.0",
-  "description": "This here is a 3d geometric ray tracer implemented in Java. You kinda have to know about graphics to use it, sorry. So basically to use it you've gotta give it some input. That input comes in the form of a file. Your file should have a line that looks like:",
+  "description": "This here is a 3d geometric ray tracer implemented in Java, Javascript and Go.",
   "main": "index.js",
   "directories": {
     "example": "examples"
