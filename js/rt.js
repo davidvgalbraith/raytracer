@@ -333,34 +333,43 @@
         if (shape.type === "ellipsoid") {
             var radii = shape.radii;
             var rotations = shape.rotation;
+
             var scale = matrix(4, 4);
             scale.data[0][0] = radii.x;
             scale.data[1][1] = radii.y;
             scale.data[2][2] = radii.z;
+
             var translate = matrix(4, 4);
             translate.data[0][3] = shape.center[0];
             translate.data[1][3] = shape.center[1];
             translate.data[2][3] = shape.center[2];
+
             var rotx = rotation("x", Math.PI/180 * rotations.x);
             var roty = rotation("y", Math.PI/180 * rotations.y);
             var rotz = rotation("z", Math.PI/180 * rotations.z);
             var rotate = rotx.times(roty).times(rotz);
+
             var objToWorld = rotate.times(scale);
             objToWorld = translate.times(objToWorld);
+
             var descale = matrix(4, 4);
             descale.data[0][0] = 1/radii.x;
             descale.data[1][1] = 1/radii.y;
             descale.data[2][2] = 1/radii.z;
+
             var detranslate = matrix(4, 4);
             detranslate.data[0][3] = -shape.center[0];
             detranslate.data[1][3] = -shape.center[1];
             detranslate.data[2][3] = -shape.center[2];
+
             var derotx = rotation("x", -Math.PI/180 * rotations.x);
             var deroty = rotation("y", -Math.PI/180 * rotations.y);
             var derotz = rotation("z", -Math.PI/180 * rotations.z);
             var derotate = derotz.times(deroty).times(derotx);
+
             var worldToObj = derotate.times(detranslate);
             worldToObj = descale.times(worldToObj);
+
             shape.objToWorld = objToWorld;
             shape.worldToObj = worldToObj;
             shape.radius = 1;

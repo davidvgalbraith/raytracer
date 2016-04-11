@@ -19,6 +19,8 @@ type ShapeCard struct {
     Type string
     Center []float64
     Radius float64
+    Radii Vector
+    Rotations Vector
     Shading Shading
 }
 
@@ -59,16 +61,32 @@ func GetScene() Scene {
 	var scene Scene
 	Panick(jsonParser.Decode(&scene))
     for _, shapeCard := range scene.ShapeCards {
-        if shapeCard.Type == "sphere" {
-            sphere := Ellipse{
-                Center: shapeCard.Center,
-                Radius: shapeCard.Radius,
-                Shading: shapeCard.Shading,
-                ObjToWorld: Identity(4, 4),
-                WorldToObj: Identity(4, 4),
-            }
-            scene.Shapes = append(scene.Shapes, sphere)
-        }
+        switch shapeCard.Type {
+            case "sphere":
+                sphere := Ellipse{
+                    Center: shapeCard.Center,
+                    Radius: shapeCard.Radius,
+                    Shading: shapeCard.Shading,
+                    ObjToWorld: Identity(4, 4),
+                    WorldToObj: Identity(4, 4),
+                }
+                scene.Shapes = append(scene.Shapes, sphere)
+            case "ellipsoid":
+                radii := shapeCard.Radii
+                center := shapeCard.Center
+                rotations := shapeCard.Rotations
+
+                objToWorldScale := ScaleMatrix(radii.X, radii.Y, radii.Z)
+                objToWorldTranslate := TranslateMatrix(center.X, center.Y, center.Z)
+                objToWorldRotate := RotationMatrix(rotations.X, rotations.Y, rotations.Z)
+
+                objToWorld := objToWorldTranslate.times(objToWorldRotate.times(objToWorldScale))
+
+                worldToObjScale := ScaleMatrix(1.0 / radii.X, 1.0 / radii.Y, 1.0 / radii.Z)
+                worldToObjTranslate := TranslateMatrix(-center.X, -center.Y, -center.Z)
+                worldToObjRotate := RotationMatrix(-rotations.X, -rotations.Y, -rotations.Z)
+
+                worldToObj := worldToObjTranslate.times(worldToObjRotate.times(worldToObjScale))
     }
 
 	return scene
