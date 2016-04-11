@@ -111,11 +111,11 @@
                         }
                         var t1 = (-1 * b + Math.sqrt(disc)) / (2 * a);
                         var t2 = (-1 * b - Math.sqrt(disc)) / (2 * a);
-                        var thit;
-                        if (t1 < 0.001 && t2 < 0.001) {
+                        var thit = Math.max(t1, t2);
+                        if (thit < 0.001) {
                             continue;
                         }
-                        if (t1 > 0.001 && t2 < 0.001) {
+                        if (t2 < 0.001) {
                             thit = t1;
                         } else {
                             thit = t2;
