@@ -123,7 +123,12 @@
                         if (thit < tmin) {
                             ret = ret || {};
                             tmin = thit;
-                            ret.normal = ray(shape.objToWorld.homomult(transray.valueAt(thit), 1), shape.worldToObj.transpose().homomult(transray.valueAt(thit).minus(vector(shape.center)), 0).normalize());
+                            var localIntersection = transray.valueAt(thit)
+                            var localNormalDirection = localIntersection.minus(vector(shape.center))
+                            ret.normal = ray(
+                                shape.objToWorld.homomult(localIntersection, 1),
+                                shape.worldToObj.transpose().homomult(localNormalDirection, 0).normalize()
+                            );
                             ret.shape = shape;
                         }
                     }
@@ -317,7 +322,7 @@
 
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "http://localhost:12345/red-circle", false);
+    inputFile.open("GET", "http://localhost:12345/red-ellipsoid", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);
@@ -347,6 +352,7 @@
             var rotx = rotation("x", Math.PI/180 * rotations.x);
             var roty = rotation("y", Math.PI/180 * rotations.y);
             var rotz = rotation("z", Math.PI/180 * rotations.z);
+
             var rotate = rotx.times(roty).times(rotz);
 
             var objToWorld = rotate.times(scale);
@@ -365,6 +371,7 @@
             var derotx = rotation("x", -Math.PI/180 * rotations.x);
             var deroty = rotation("y", -Math.PI/180 * rotations.y);
             var derotz = rotation("z", -Math.PI/180 * rotations.z);
+
             var derotate = derotz.times(deroty).times(derotx);
 
             var worldToObj = derotate.times(detranslate);

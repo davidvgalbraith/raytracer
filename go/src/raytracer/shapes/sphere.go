@@ -7,7 +7,7 @@ import (
     "math"
 )
 
-type Ellipse struct {
+type Sphere struct {
 	Center []float64
 	Radius float64
 	Shading Shading
@@ -15,12 +15,15 @@ type Ellipse struct {
     WorldToObj Matrix
 }
 
-func (s Ellipse) Intersect(ray Ray) (time float64, normal Ray) {
+func (s Sphere) Intersect(ray Ray) (time float64, normal Ray) {
 	center := BuildVector(s.Center)
-	emc := ray.Position.Minus(center)
+    localPosition := s.WorldToObj.HomogeneousTimes(ray.Position, 1)
+    localDirection := s.WorldToObj.HomogeneousTimes(ray.Direction, 0)
+    localRay := BuildRay(localPosition, localDirection)
+	emc := localPosition.Minus(center)
 
-	a := ray.Direction.Dot(ray.Direction)
-	b := 2 * ray.Direction.Dot(emc)
+	a := localDirection.Dot(localDirection)
+	b := 2 * localDirection.Dot(emc)
 	c := emc.Dot(emc) - s.Radius * s.Radius
 
 	discriminant := b * b - 4 * a * c
@@ -36,12 +39,15 @@ func (s Ellipse) Intersect(ray Ray) (time float64, normal Ray) {
 	}
 
 	if intersectionT2 > MIN_INTERSECTION_TIME { time = intersectionT2 } else { time = intersectionT1 }
-	intersectionPosition := ray.ValueAt(time)
-	normalDirection := ray.ValueAt(time).Minus(center).Normalize()
+	localIntersectionPosition := localRay.ValueAt(time)
+    intersectionPosition := s.ObjToWorld.HomogeneousTimes(localIntersectionPosition, 1.0)
+
+	localNormalDirection := localIntersectionPosition.Minus(center)
+    normalDirection := s.WorldToObj.Transpose().HomogeneousTimes(localNormalDirection, 0.0).Normalize()
 
 	return time, BuildRay(intersectionPosition, normalDirection)
 }
 
-func (e Ellipse) GetShading() Shading {
+func (e Sphere) GetShading() Shading {
     return e.Shading
 }

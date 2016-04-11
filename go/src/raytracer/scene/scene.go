@@ -20,7 +20,7 @@ type ShapeCard struct {
     Center []float64
     Radius float64
     Radii Vector
-    Rotations Vector
+    Rotation Vector
     Shading Shading
 }
 
@@ -63,7 +63,7 @@ func GetScene() Scene {
     for _, shapeCard := range scene.ShapeCards {
         switch shapeCard.Type {
             case "sphere":
-                sphere := Ellipse{
+                sphere := Sphere{
                     Center: shapeCard.Center,
                     Radius: shapeCard.Radius,
                     Shading: shapeCard.Shading,
@@ -73,20 +73,31 @@ func GetScene() Scene {
                 scene.Shapes = append(scene.Shapes, sphere)
             case "ellipsoid":
                 radii := shapeCard.Radii
-                center := shapeCard.Center
-                rotations := shapeCard.Rotations
+                center := BuildVector(shapeCard.Center)
+                rotation := shapeCard.Rotation
 
                 objToWorldScale := ScaleMatrix(radii.X, radii.Y, radii.Z)
                 objToWorldTranslate := TranslateMatrix(center.X, center.Y, center.Z)
-                objToWorldRotate := RotationMatrix(rotations.X, rotations.Y, rotations.Z)
+                objToWorldRotate := RotationMatrix(rotation.X, rotation.Y, rotation.Z)
 
-                objToWorld := objToWorldTranslate.times(objToWorldRotate.times(objToWorldScale))
+                objToWorld := objToWorldTranslate.Times(objToWorldRotate.Times(objToWorldScale))
 
                 worldToObjScale := ScaleMatrix(1.0 / radii.X, 1.0 / radii.Y, 1.0 / radii.Z)
                 worldToObjTranslate := TranslateMatrix(-center.X, -center.Y, -center.Z)
-                worldToObjRotate := RotationMatrix(-rotations.X, -rotations.Y, -rotations.Z)
+                worldToObjRotate := DeRotationMatrix(rotation.X, rotation.Y, rotation.Z)
 
-                worldToObj := worldToObjTranslate.times(worldToObjRotate.times(worldToObjScale))
+                worldToObj := worldToObjScale.Times(worldToObjRotate.Times(worldToObjTranslate))
+
+                ellipsoid := Sphere{
+                    Center: []float64{0.0, 0.0, 0.0},
+                    Radius: 1.0,
+                    Shading: shapeCard.Shading,
+                    ObjToWorld: objToWorld,
+                    WorldToObj: worldToObj,
+                }
+
+                scene.Shapes = append(scene.Shapes, ellipsoid)
+        }
     }
 
 	return scene
