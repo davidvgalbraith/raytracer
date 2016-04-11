@@ -8,12 +8,15 @@ import (
 	"image/png"
 	"math"
 	"os"
+	. "raytracer/vector"
 )
 
 const MAX_REFLECTIONS = 5
 const MIN_INTERSECTION_TIME = 0.001
 const MAX_COLOR = 255
 var BLACK = color.RGBA{0, 0, 0, MAX_COLOR}
+
+// type Vector vector.Vector
 
 type Camera struct {
 	Origin []float64
@@ -41,50 +44,13 @@ type Light struct {
 	Color []float64
 }
 
-type Vector struct {
-	x float64
-	y float64
-	z float64
-}
-
-func (v1 Vector) plus(v2 Vector) Vector {
-	return buildVector([]float64{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z})
-}
-
-func (v1 Vector) minus(v2 Vector) Vector {
-	return buildVector([]float64{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z})
-}
-
-func (v1 Vector) times(m float64) Vector {
-	return buildVector([]float64{v1.x * m, v1.y * m, v1.z * m})
-}
-
-func (v1 Vector) vtimes(v2 Vector) Vector {
-	return buildVector([]float64{v1.x * v2.x, v1.y * v2.y, v1.z * v2.z})
-}
-
-func (v1 Vector) dot(v2 Vector) float64 {
-	return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z)
-}
-
-func (v Vector) norm() float64 {
-	return math.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-}
-
-func (v Vector) normalize() Vector {
-	norm := v.norm()
-	if norm == 0 { panic("Tried to normalize a zero vector") }
-
-	return buildVector([]float64{v.x / norm, v.y / norm, v.z / norm})
-}
-
 type Ray struct {
 	Position Vector
 	Direction Vector
 }
 
 func (r Ray) valueAt(time float64) Vector {
-	return r.Position.plus(r.Direction.times(time))
+	return r.Position.Plus(r.Direction.Times(time))
 }
 
 type Sphere struct {
@@ -94,12 +60,12 @@ type Sphere struct {
 }
 
 func (s Sphere) intersect(ray Ray) (time float64, normal Ray) {
-	center := buildVector(s.Center)
-	emc := ray.Position.minus(center)
+	center := BuildVector(s.Center)
+	emc := ray.Position.Minus(center)
 
-	a := ray.Direction.dot(ray.Direction)
-	b := 2 * ray.Direction.dot(emc)
-	c := emc.dot(emc) - s.Radius * s.Radius
+	a := ray.Direction.Dot(ray.Direction)
+	b := 2 * ray.Direction.Dot(emc)
+	c := emc.Dot(emc) - s.Radius * s.Radius
 
 	discriminant := b * b - 4 * a * c
 	if discriminant < 0 {
@@ -115,7 +81,7 @@ func (s Sphere) intersect(ray Ray) (time float64, normal Ray) {
 
 	if intersectionT2 > MIN_INTERSECTION_TIME { time = intersectionT2 } else { time = intersectionT1 }
 	intersectionPosition := ray.valueAt(time)
-	normalDirection := ray.valueAt(time).minus(center).normalize()
+	normalDirection := ray.valueAt(time).Minus(center).Normalize()
 
 	return time, buildRay(intersectionPosition, normalDirection)
 }
@@ -164,18 +130,18 @@ func calculateColor(scene Scene, x, y int) color.RGBA {
 	fx := float64(x)
 	fy := float64(y)
 	camera := scene.Camera
-	origin := buildVector(camera.Origin)
+	origin := BuildVector(camera.Origin)
 	pixelsX := float64(camera.PixelsX)
 	pixelsY := float64(camera.PixelsY)
 	viewPlane := camera.ViewPlane
 
-	ul := buildVector(viewPlane.Upper_Left)
-	ur := buildVector(viewPlane.Upper_Right)
-	ll := buildVector(viewPlane.Lower_Left)
+	ul := BuildVector(viewPlane.Upper_Left)
+	ur := BuildVector(viewPlane.Upper_Right)
+	ll := BuildVector(viewPlane.Lower_Left)
 
-	xpos := ul.x + (fx / pixelsX) * (ur.x - ul.x) + 1.0 / (2 * pixelsX)
-	ypos := ul.y + (fy / pixelsY) * (ll.y - ul.y) + 1.0 / (2 * pixelsY)
-	screenpos := buildVector([]float64{xpos, ypos, ul.z})
+	xpos := ul.X + (fx / pixelsX) * (ur.X - ul.X) + 1.0 / (2 * pixelsX)
+	ypos := ul.Y + (fy / pixelsY) * (ll.Y - ul.Y) + 1.0 / (2 * pixelsY)
+	screenpos := BuildVector([]float64{xpos, ypos, ul.Z})
 	eyeRay := buildRay(origin, screenpos)
 
 	return trace(eyeRay, scene)
@@ -192,68 +158,60 @@ func trace(ray Ray, scene Scene) color.RGBA {
 		if (!didIntersect) { return BLACK }
 
 		shading := shape.Shading
-		ambient := buildVector(shading.Ambient)
+		ambient := BuildVector(shading.Ambient)
 
-		colorVector := buildVector([]float64{0, 0, 0})
+		colorVector := BuildVector([]float64{0, 0, 0})
 
 		for _, light := range scene.Lights {
-			lightColor := buildVector(light.Color)
+			lightColor := BuildVector(light.Color)
 			if numReflections == 0 {
-				colorVector = colorVector.plus(ambient.vtimes(lightColor))
+				colorVector = colorVector.Plus(ambient.Vtimes(lightColor))
 			}
 			if light.Type == "directional" {
 				// the genius of this is lightRay points from the point on the
 				// object we're coloring back towards the light source and if
 				// we hit anything along the way we know it's blocked
-				lightRay := buildRay(normal.Position, buildVector(light.Direction).times(-1))
+				lightRay := buildRay(normal.Position, BuildVector(light.Direction).Times(-1))
 				_, _, lightBlocked := scene.intersect(lightRay)
 				if !lightBlocked {
-					colorVector = colorVector.plus(diffuse(light, lightRay, shading, normal))
-					colorVector = colorVector.plus(specular(light, lightRay, shading, normal, origin))
+					colorVector = colorVector.Plus(diffuse(light, lightRay, shading, normal))
+					colorVector = colorVector.Plus(specular(light, lightRay, shading, normal, origin))
 				}
 			}
 		}
 
-		colorVector = colorVector.times(MAX_COLOR)
+		colorVector = colorVector.Times(MAX_COLOR)
 
-		return color.RGBA{floor(colorVector.x), floor(colorVector.y), floor(colorVector.z), MAX_COLOR}
+		return color.RGBA{floor(colorVector.X), floor(colorVector.Y), floor(colorVector.Z), MAX_COLOR}
 	}
 
 	return traceWithReflections(ray, scene, 0)
 }
 
 func diffuse(light Light, lightRay Ray, shading Shading, normal Ray) Vector {
-	l := lightRay.Direction.normalize()
-	dot := l.dot(normal.Direction)
-	kd := buildVector(shading.Diffuse)
+	l := lightRay.Direction.Normalize()
+	dot := l.Dot(normal.Direction)
+	kd := BuildVector(shading.Diffuse)
 
-	return buildVector(light.Color).vtimes(kd).times(dot)
+	return BuildVector(light.Color).Vtimes(kd).Times(dot)
 }
 
 func specular(light Light, lightRay Ray, shading Shading, normal Ray, origin Vector) Vector {
-	l := lightRay.Direction.normalize()
+	l := lightRay.Direction.Normalize()
 	n := normal.Direction
-	r := l.times(-1).plus(n.times(2 * n.dot(l))).normalize()
-	v := origin.minus(normal.Position).normalize()
-	ks := buildVector(shading.Specular)
+	r := l.Times(-1).Plus(n.Times(2 * n.Dot(l))).Normalize()
+	v := origin.Minus(normal.Position).Normalize()
+	ks := BuildVector(shading.Specular)
 	sp := shading.Specular_Exponent
-	dot := math.Max(r.dot(v), 0)
+	dot := math.Max(r.Dot(v), 0)
 	dot = math.Pow(dot, sp)
 
-	return buildVector(light.Color).vtimes(ks).times(dot)
+	return BuildVector(light.Color).Vtimes(ks).Times(dot)
 }
 
 func floor(x float64) uint8 {
 	if (x > MAX_COLOR) { return MAX_COLOR }
 	return uint8(math.Floor(x))
-}
-
-func buildVector(elements []float64) Vector {
-	return Vector{
-		x: elements[0],
-		y: elements[1],
-		z: elements[2],
-	}
 }
 
 func buildRay(position, direction Vector) Ray {
