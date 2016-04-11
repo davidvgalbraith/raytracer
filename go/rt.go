@@ -191,8 +191,11 @@ func trace(ray Ray, scene Scene) color.RGBA {
 
 		if (!didIntersect) { return BLACK }
 
+		shading := shape.Shading
+		ambient := buildVector(shading.Ambient)
+
 		colorVector := buildVector([]float64{0, 0, 0})
-		ambient := buildVector(shape.Shading.Ambient)
+
 		for _, light := range scene.Lights {
 			lightColor := buildVector(light.Color)
 			if numReflections == 0 {
@@ -205,7 +208,8 @@ func trace(ray Ray, scene Scene) color.RGBA {
 				lightRay := buildRay(normal.Position, buildVector(light.Direction).times(-1))
 				_, _, lightBlocked := scene.intersect(lightRay)
 				if !lightBlocked {
-					colorVector = colorVector.plus(diffuse(light, lightRay, shape, normal))
+					colorVector = colorVector.plus(diffuse(light, lightRay, shading, normal))
+					colorVector = colorVector.plus(specular(light, lightRay, shading, normal, origin))
 				}
 			}
 		}
@@ -218,12 +222,25 @@ func trace(ray Ray, scene Scene) color.RGBA {
 	return traceWithReflections(ray, scene, 0)
 }
 
-func diffuse(light Light, lightRay Ray, shape Sphere, normal Ray) Vector {
+func diffuse(light Light, lightRay Ray, shading Shading, normal Ray) Vector {
 	l := lightRay.Direction.normalize()
 	dot := l.dot(normal.Direction)
-	kd := buildVector(shape.Shading.Diffuse)
+	kd := buildVector(shading.Diffuse)
 
 	return buildVector(light.Color).vtimes(kd).times(dot)
+}
+
+func specular(light Light, lightRay Ray, shading Shading, normal Ray, origin Vector) Vector {
+	l := lightRay.Direction.normalize()
+	n := normal.Direction
+	r := l.times(-1).plus(n.times(2 * n.dot(l))).normalize()
+	v := origin.minus(normal.Position).normalize()
+	ks := buildVector(shading.Specular)
+	sp := shading.Specular_Exponent
+	dot := math.Max(r.dot(v), 0)
+	dot = math.Pow(dot, sp)
+
+	return buildVector(light.Color).vtimes(ks).times(dot)
 }
 
 func floor(x float64) uint8 {
