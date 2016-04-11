@@ -1,118 +1,19 @@
 package main
 
 import (
-    "encoding/json"
 	"fmt"
 	"image"
 	"image/color"
-	"image/png"
 	"math"
-	"os"
-	. "raytracer/vector"
+	. "raytracer/geometry"
+	. "raytracer/common"
+	. "raytracer/scene"
+	. "raytracer/scene_objects"
 )
-
-const MAX_REFLECTIONS = 5
-const MIN_INTERSECTION_TIME = 0.001
-const MAX_COLOR = 255
-var BLACK = color.RGBA{0, 0, 0, MAX_COLOR}
-
-// type Vector vector.Vector
-
-type Camera struct {
-	Origin []float64
-	ViewPlane struct {
-		Lower_Left []float64
-		Lower_Right []float64
-		Upper_Left []float64
-		Upper_Right []float64
-	} `json:"view_plane"`
-	PixelsX int
-	PixelsY int
-}
-
-type Shading struct {
-	Ambient []float64
-	Diffuse []float64
-	Reflection []float64
-	Specular []float64
-	Specular_Exponent float64
-}
-
-type Light struct {
-	Type string
-	Direction []float64
-	Color []float64
-}
-
-type Ray struct {
-	Position Vector
-	Direction Vector
-}
-
-func (r Ray) valueAt(time float64) Vector {
-	return r.Position.Plus(r.Direction.Times(time))
-}
-
-type Sphere struct {
-	Center []float64
-	Radius float64
-	Shading Shading
-}
-
-func (s Sphere) intersect(ray Ray) (time float64, normal Ray) {
-	center := BuildVector(s.Center)
-	emc := ray.Position.Minus(center)
-
-	a := ray.Direction.Dot(ray.Direction)
-	b := 2 * ray.Direction.Dot(emc)
-	c := emc.Dot(emc) - s.Radius * s.Radius
-
-	discriminant := b * b - 4 * a * c
-	if discriminant < 0 {
-		return math.Inf(1), Ray{}
-	}
-
-	intersectionT1 := (-1 * b + math.Sqrt(discriminant)) / (2 * a)
-	intersectionT2 := (-1 * b - math.Sqrt(discriminant)) / (2 * a)
-
-	if math.Max(intersectionT1, intersectionT2) < MIN_INTERSECTION_TIME {
-		return math.Inf(1), Ray{}
-	}
-
-	if intersectionT2 > MIN_INTERSECTION_TIME { time = intersectionT2 } else { time = intersectionT1 }
-	intersectionPosition := ray.valueAt(time)
-	normalDirection := ray.valueAt(time).Minus(center).Normalize()
-
-	return time, buildRay(intersectionPosition, normalDirection)
-}
-
-type Scene struct {
-	Name string
-	Camera Camera
-	Lights []Light
-	Shapes []Sphere
-}
-
-func (s Scene) intersect(ray Ray) (shape Sphere, normal Ray, didIntersect bool) {
-	thit := math.Inf(1)
-	closestShape := Sphere{}
-	closestNormal := Ray{}
-
-	for _, shape := range s.Shapes {
-		time, normal := shape.intersect(ray)
-		if time < thit {
-			thit = time
-			closestShape = shape
-			closestNormal = normal
-		}
-	}
-
-	return closestShape, closestNormal, thit < math.Inf(1)
-}
 
 func main() {
 	fmt.Printf("")
-	scene := getScene()
+	scene := GetScene()
 	var img = image.NewRGBA(image.Rect(0, 0, scene.Camera.PixelsX, scene.Camera.PixelsY))
 	bounds := img.Bounds()
 
@@ -123,7 +24,7 @@ func main() {
 		}
 	}
 
-	writeImage(img)
+	WriteImage(img)
 }
 
 func calculateColor(scene Scene, x, y int) color.RGBA {
@@ -142,7 +43,7 @@ func calculateColor(scene Scene, x, y int) color.RGBA {
 	xpos := ul.X + (fx / pixelsX) * (ur.X - ul.X) + 1.0 / (2 * pixelsX)
 	ypos := ul.Y + (fy / pixelsY) * (ll.Y - ul.Y) + 1.0 / (2 * pixelsY)
 	screenpos := BuildVector([]float64{xpos, ypos, ul.Z})
-	eyeRay := buildRay(origin, screenpos)
+	eyeRay := BuildRay(origin, screenpos)
 
 	return trace(eyeRay, scene)
 }
@@ -153,11 +54,11 @@ func trace(ray Ray, scene Scene) color.RGBA {
 		origin = ray.Position
 		if (numReflections > MAX_REFLECTIONS) { return BLACK }
 
-		shape, normal, didIntersect := scene.intersect(ray)
+		shape, normal, didIntersect := scene.Intersect(ray)
 
 		if (!didIntersect) { return BLACK }
 
-		shading := shape.Shading
+		shading := shape.GetShading()
 		ambient := BuildVector(shading.Ambient)
 
 		colorVector := BuildVector([]float64{0, 0, 0})
@@ -171,8 +72,8 @@ func trace(ray Ray, scene Scene) color.RGBA {
 				// the genius of this is lightRay points from the point on the
 				// object we're coloring back towards the light source and if
 				// we hit anything along the way we know it's blocked
-				lightRay := buildRay(normal.Position, BuildVector(light.Direction).Times(-1))
-				_, _, lightBlocked := scene.intersect(lightRay)
+				lightRay := BuildRay(normal.Position, BuildVector(light.Direction).Times(-1))
+				_, _, lightBlocked := scene.Intersect(lightRay)
 				if !lightBlocked {
 					colorVector = colorVector.Plus(diffuse(light, lightRay, shading, normal))
 					colorVector = colorVector.Plus(specular(light, lightRay, shading, normal, origin))
@@ -212,41 +113,4 @@ func specular(light Light, lightRay Ray, shading Shading, normal Ray, origin Vec
 func floor(x float64) uint8 {
 	if (x > MAX_COLOR) { return MAX_COLOR }
 	return uint8(math.Floor(x))
-}
-
-func buildRay(position, direction Vector) Ray {
-	return Ray{
-		Position: position,
-		Direction: direction,
-	}
-}
-
-func getScene() Scene {
-	if len(os.Args) < 2 {
-		panic("specify a JSON file containing a scene")
-	}
-	file := os.Args[1]
-	configFile, err := os.Open(file)
-	panick(err)
-
-	jsonParser := json.NewDecoder(configFile)
-	var scene Scene
-	panick(jsonParser.Decode(&scene))
-
-	return scene
-}
-
-func panick(err error) {
-	if (err != nil) {
-		panic(err)
-	}
-}
-
-func writeImage(img *image.RGBA) {
-	f, err := os.Create("draww.png")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	png.Encode(f, img)
 }
