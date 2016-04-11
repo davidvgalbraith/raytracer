@@ -81,8 +81,13 @@
             //handle reflection
             var kr = vector(collision.shape.shading.reflection);
             if (kr.exceeds(0)) {
-                var reflectdir = (rayr.direction.normalize().times(-1).plus(collision.normal.direction.times(2 * collision.normal.direction.dot(rayr.direction.normalize())))).times(-1);
-                color = color.plus(rt.trace(ray(collision.normal.position, reflectdir), reflections + 1).vtimes(kr));
+                var oppositeDirection = rayr.direction.normalize().times(-1);
+                var correctionFactor = 2 * collision.normal.direction.dot(rayr.direction.normalize());
+                var correction = collision.normal.direction.times(correctionFactor);
+                var reflectdir = (oppositeDirection.plus(correction)).times(-1);
+                var reflectedRay = ray(collision.normal.position, reflectdir);
+
+                color = color.plus(rt.trace(reflectedRay, reflections + 1).vtimes(kr));
             }
             return color;
         }
@@ -322,7 +327,7 @@
 
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "http://localhost:12345/red-ellipsoid", false);
+    inputFile.open("GET", "http://localhost:12345/five-ellipsoids", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);

@@ -32,13 +32,14 @@ func CalculateColor(scene Scene, x, y int) color.RGBA {
 
 func trace(ray Ray, scene Scene) color.RGBA {
 	var origin Vector;
-	traceWithReflections := func(ray Ray, scene Scene, numReflections int) color.RGBA {
+	var traceWithReflections func(ray Ray, scene Scene, numReflections int) Vector
+	traceWithReflections = func(ray Ray, scene Scene, numReflections int) Vector {
 		origin = ray.Position
-		if (numReflections > MAX_REFLECTIONS) { return BLACK }
+		if (numReflections > MAX_REFLECTIONS) { return ZERO_VECTOR }
 
 		shape, normal, didIntersect := scene.Intersect(ray)
 
-		if (!didIntersect) { return BLACK }
+		if (!didIntersect) { return ZERO_VECTOR }
 
 		shading := shape.GetShading()
 		ambient := BuildVector(shading.Ambient)
@@ -63,12 +64,29 @@ func trace(ray Ray, scene Scene) color.RGBA {
 			}
 		}
 
-		colorVector = colorVector.Times(MAX_COLOR)
+		reflection := BuildVector(shading.Reflection)
+		if reflection.X > 0.0 || reflection.Y > 0.0 || reflection.Z > 0.0 {
+			reflectRay := calculateReflectRay(ray, normal)
+			reflectionColor := traceWithReflections(reflectRay, scene, numReflections + 1).Vtimes(reflection)
+			colorVector = colorVector.Plus(reflectionColor)
+		}
 
-		return color.RGBA{floor(colorVector.X), floor(colorVector.Y), floor(colorVector.Z), MAX_COLOR}
+		return colorVector
 	}
 
-	return traceWithReflections(ray, scene, 0)
+	colorVector := traceWithReflections(ray, scene, 0)
+	colorVector = colorVector.Times(MAX_COLOR)
+
+	return color.RGBA{floor(colorVector.X), floor(colorVector.Y), floor(colorVector.Z), MAX_COLOR}
+}
+
+func calculateReflectRay(incident, surfaceNormal Ray) Ray {
+	oppositeDirection := incident.Direction.Normalize().Times(-1)
+	correctionFactor := 2 * surfaceNormal.Direction.Dot(incident.Direction.Normalize())
+	correction := surfaceNormal.Direction.Times(correctionFactor)
+	reflectDirection := (oppositeDirection.Plus(correction)).Times(-1)
+
+	return BuildRay(surfaceNormal.Position, reflectDirection)
 }
 
 func diffuse(light Light, lightRay Ray, shading Shading, normal Ray) Vector {

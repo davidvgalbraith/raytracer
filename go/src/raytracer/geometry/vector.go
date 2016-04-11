@@ -16,6 +16,8 @@ func BuildVector(elements []float64) Vector {
 	}
 }
 
+var ZERO_VECTOR = BuildVector([]float64{0.0, 0.0, 0.0})
+
 func (v1 Vector) Plus(v2 Vector) Vector {
 	return BuildVector([]float64{v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z})
 }
