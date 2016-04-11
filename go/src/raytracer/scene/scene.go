@@ -60,10 +60,12 @@ func GetScene() Scene {
 	Panick(jsonParser.Decode(&scene))
     for _, shapeCard := range scene.ShapeCards {
         if shapeCard.Type == "sphere" {
-            sphere := Sphere{
+            sphere := Ellipse{
                 Center: shapeCard.Center,
                 Radius: shapeCard.Radius,
                 Shading: shapeCard.Shading,
+                ObjToWorld: Identity(4, 4),
+                WorldToObj: Identity(4, 4),
             }
             scene.Shapes = append(scene.Shapes, sphere)
         }

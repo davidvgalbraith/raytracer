@@ -7,13 +7,15 @@ import (
     "math"
 )
 
-type Sphere struct {
+type Ellipse struct {
 	Center []float64
 	Radius float64
 	Shading Shading
+    ObjToWorld Matrix
+    WorldToObj Matrix
 }
 
-func (s Sphere) Intersect(ray Ray) (time float64, normal Ray) {
+func (s Ellipse) Intersect(ray Ray) (time float64, normal Ray) {
 	center := BuildVector(s.Center)
 	emc := ray.Position.Minus(center)
 
@@ -40,6 +42,6 @@ func (s Sphere) Intersect(ray Ray) (time float64, normal Ray) {
 	return time, BuildRay(intersectionPosition, normalDirection)
 }
 
-func (s Sphere) GetShading() Shading {
-    return s.Shading
+func (e Ellipse) GetShading() Shading {
+    return e.Shading
 }

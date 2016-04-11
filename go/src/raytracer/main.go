@@ -2,14 +2,13 @@ package main
 
 import (
 	"image"
-	. "raytracer/geometry"
-	. "raytracer/common"
-	. "raytracer/scene"
+	"raytracer/common"
+	"raytracer/scene"
 	"raytracer/coloring"
 )
 
 func main() {
-	scene := GetScene()
+	scene := scene.GetScene()
 	img := image.NewRGBA(image.Rect(0, 0, scene.Camera.PixelsX, scene.Camera.PixelsY))
 	bounds := img.Bounds()
 
@@ -20,5 +19,5 @@ func main() {
 		}
 	}
 
-	WriteImage(img)
+	common.WriteImage(img)
 }
