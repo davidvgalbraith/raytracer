@@ -12,7 +12,8 @@ import (
 
 const MAX_REFLECTIONS = 5
 const MIN_INTERSECTION_TIME = 0.001
-var BLACK = color.RGBA{0, 0, 0, 255}
+const MAX_COLOR = 255
+var BLACK = color.RGBA{0, 0, 0, MAX_COLOR}
 
 type Camera struct {
 	Origin []float64
@@ -186,7 +187,7 @@ func trace(ray Ray, scene Scene) color.RGBA {
 		origin = ray.Position
 		if (numReflections > MAX_REFLECTIONS) { return BLACK }
 
-		shape, _, didIntersect := scene.intersect(ray)
+		shape, normal, didIntersect := scene.intersect(ray)
 
 		if (!didIntersect) { return BLACK }
 
@@ -197,17 +198,36 @@ func trace(ray Ray, scene Scene) color.RGBA {
 			if numReflections == 0 {
 				colorVector = colorVector.plus(ambient.vtimes(lightColor))
 			}
+			if light.Type == "directional" {
+				// the genius of this is lightRay points from the point on the
+				// object we're coloring back towards the light source and if
+				// we hit anything along the way we know it's blocked
+				lightRay := buildRay(normal.Position, buildVector(light.Direction).times(-1))
+				_, _, lightBlocked := scene.intersect(lightRay)
+				if !lightBlocked {
+					colorVector = colorVector.plus(diffuse(light, lightRay, shape, normal))
+				}
+			}
 		}
 
-		colorVector = colorVector.times(255)
+		colorVector = colorVector.times(MAX_COLOR)
 
-		return color.RGBA{floor(colorVector.x), floor(colorVector.y), floor(colorVector.z), 255}
+		return color.RGBA{floor(colorVector.x), floor(colorVector.y), floor(colorVector.z), MAX_COLOR}
 	}
 
 	return traceWithReflections(ray, scene, 0)
 }
 
+func diffuse(light Light, lightRay Ray, shape Sphere, normal Ray) Vector {
+	l := lightRay.Direction.normalize()
+	dot := l.dot(normal.Direction)
+	kd := buildVector(shape.Shading.Diffuse)
+
+	return buildVector(light.Color).vtimes(kd).times(dot)
+}
+
 func floor(x float64) uint8 {
+	if (x > MAX_COLOR) { return MAX_COLOR }
 	return uint8(math.Floor(x))
 }
 
