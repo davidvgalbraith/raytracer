@@ -22,6 +22,7 @@ type ShapeCard struct {
     Radii Vector
     Rotation Vector
     Shading Shading
+    Vertices [][]float64
 }
 
 type Scene struct {
@@ -97,6 +98,13 @@ func GetScene() Scene {
                 }
 
                 scene.Shapes = append(scene.Shapes, ellipsoid)
+            case "triangle":
+                triangle := Triangle{
+                    Vertices: shapeCard.Vertices,
+                    Shading: shapeCard.Shading,
+                }
+
+                scene.Shapes = append(scene.Shapes, triangle)
         }
     }
 

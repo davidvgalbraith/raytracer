@@ -1,5 +1,7 @@
 //a javascript raytracer
 
+/* global XMLHttpRequest, document */
+
 (function() {
 
     //scene and its discontents
@@ -12,7 +14,8 @@
             var ypos = camera.UL.y + (y / camera.pixelsY) * (camera.LL.y - camera.UL.y) + 1 / (2 * camera.pixelsY);
             var screenpos = vector([xpos, ypos, camera.UL.z]);
             return ray(vector(camera.origin), screenpos);
-        }
+        };
+
         for (x = 0; x < camera.pixelsX * camera.pixelsY * 4; x += 4) {
             var xfour = x / 4;
             var raaay = generateRay(xfour % camera.pixelsX, Math.floor(xfour / camera.pixelsX));
@@ -23,17 +26,17 @@
             imgData.data[x+3] = 255;
         }
         return imgData.data;
-    }
+    };
 
     var raytracer = function(shapes, lights, origin, maxReflections) {
         var rt = {};
-        var origin;
         //calculate the color given the normal vector and the light source
         var shade = function(light, lightray, collision) {
             var spec = speculate(light, lightray, collision);
             var diff = diffuse(light, lightray, collision);
             return spec.plus(diff);
-        }
+        };
+
         //handle specular shading
         var speculate = function(light, lightray, collision) {
             var l = lightray.direction.normalize();
@@ -46,14 +49,16 @@
             dot = Math.pow(dot, sp);
 
             return vector(light.color).vtimes(ks).times(dot);
-        }
+        };
+
         //handle diffuse shading
         var diffuse = function(light, lightray, collision) {
             var l = lightray.direction.normalize();
             var dot = l.dot(collision.normal.direction);
             var kd = vector(collision.shape.shading.diffuse);
             return vector(light.color).vtimes(kd).times(dot);
-        }
+        };
+
         rt.trace = function(rayr, reflections) {
             origin = rayr.position;
             if (reflections > maxReflections) {
@@ -90,9 +95,10 @@
                 color = color.plus(rt.trace(reflectedRay, reflections + 1).vtimes(kr));
             }
             return color;
-        }
+        };
+
         return rt;
-    }
+    };
 
     var shapeobject = function(shapes) {
         return {
@@ -128,8 +134,8 @@
                         if (thit < tmin) {
                             ret = ret || {};
                             tmin = thit;
-                            var localIntersection = transray.valueAt(thit)
-                            var localNormalDirection = localIntersection.minus(vector(shape.center))
+                            var localIntersection = transray.valueAt(thit);
+                            var localNormalDirection = localIntersection.minus(vector(shape.center));
                             ret.normal = ray(
                                 shape.objToWorld.homomult(localIntersection, 1),
                                 shape.worldToObj.transpose().homomult(localNormalDirection, 0).normalize()
@@ -138,35 +144,33 @@
                         }
                     }
                     if (shape.type === "triangle") {
-                        //incomprehensible sequence of operations to find intersection
-                        var ve = transray.position;
-                        var vd = transray.direction;
+                        // Möller–Trumbore intersection algorithm
+                        var rayPosition = transray.position;
+                        var direction = transray.direction;
                         var vc = vector(shape.vertices[2]);
                         var vb = vector(shape.vertices[1]);
                         var va = vector(shape.vertices[0]);
-                        var a = va.x - vb.x;
-                        var b = va.y - vb.y;
-                        var c = va.z - vb.z;
-                        var d = va.x - vc.x;
-                        var e = va.y - vc.y;
-                        var f = va.z - vc.z;
-                        var g = vd.x;
-                        var h = vd.y;
-                        var i = vd.z;
-                        var j = va.x - ve.x;
-                        var kk = va.y - ve.y;
-                        var l = va.z - ve.z;
-                        var eihf = e * i - h * f;
-                        var gfdi = g * f - d * i;
-                        var dheg = d * h - e * g;
-                        var akjb = a * kk - j * b;
-                        var jcal = j * c - a * l;
-                        var blkc = b * l - kk * c;
-                        var m = a * eihf + b * gfdi + c * dheg;
-                        var beta = (j * eihf + kk * gfdi + l * dheg) / m;
-                        var gamma = (i * akjb + h * jcal + g * blkc) / m;
-                        var t  = -1 * (f * akjb + e * jcal + d * blkc) / m;
-                        if (t < .001 || t > tmin || gamma < 0 || gamma > 1 || beta < 0 || beta > 1-gamma) {
+
+                        var edge1 = va.minus(vb);
+                        var edge2 = va.minus(vc);
+                        var edgeToRay = va.minus(rayPosition);
+
+                        // there's an elegant formulation with cross products and determinants
+                        // this is not that formulation
+                        var eihf = edge2.y * direction.z - direction.y * edge2.z;
+                        var gfdi = direction.x * edge2.z - edge2.x * direction.z;
+                        var dheg = edge2.x * direction.y - edge2.y * direction.x;
+                        var akjb = edge1.x * edgeToRay.y - edgeToRay.x * edge1.y;
+                        var jcal = edgeToRay.x * edge1.z - edge1.x * edgeToRay.z;
+                        var blkc = edge1.y * edgeToRay.z - edgeToRay.y * edge1.z;
+
+                        var m = edge1.x * eihf + edge1.y * gfdi + edge1.z * dheg;
+                        var beta = (edgeToRay.x * eihf + edgeToRay.y * gfdi + edgeToRay.z * dheg) / m;
+                        var gamma = (direction.z * akjb + direction.y * jcal + direction.x * blkc) / m;
+
+                        var t  = -1 * (edge2.z * akjb + edge2.y * jcal + edge2.x * blkc) / m;
+
+                        if (t < 0.001 || t > tmin || gamma < 0 || gamma > 1 || beta < 0 || beta > 1-gamma) {
                             continue;
                         }
                         ret = {};
@@ -175,7 +179,7 @@
                             ret.normal = ray(transray.valueAt(t), (shape.normals[0].times(1-beta-gamma).plus(shape.normals[1].times(beta)).plus(shape.normals[2].times(gamma))).normalize());
                             ret.shape = shape;
                         } else {
-                            ret.normal = ray(transray.valueAt(t), ((vb.minus(va)).cross(vc.minus(va))).normalize());
+                            ret.normal = ray(transray.valueAt(t), (edge1.cross(edge2)).normalize());
                             ret.shape = shape;
                         }
                     }
@@ -183,7 +187,7 @@
                 return ret;
             }
         };
-    }
+    };
 
     var ray = function(position, direction) {
         return {
@@ -193,7 +197,7 @@
                 return position.plus(direction.times(t));
             }
         };
-    }
+    };
 
     var vector = function(coordinates) {
         var v = {};
@@ -202,19 +206,19 @@
         v.z = coordinates[2];
         v.minus = function(w) {
             return vector([v.x - w.x, v.y - w.y, v.z - w.z]);
-        }
+        };
         v.plus = function(w) {
             return vector([v.x + w.x, v.y + w.y, v.z + w.z]);
-        }
+        };
         v.times = function(a) {
             return vector([a * v.x, a * v.y, a * v.z]);
-        }
+        };
         v.vtimes = function(w) {
             return vector([v.x * w.x, v.y * w.y, v.z * w.z]);
-        }
+        };
         v.dot = function(w) {
             return v.x * w.x + v.y * w.y + v.z * w.z;
-        }
+        };
         v.normalize = function() {
             var norm = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
             if (norm === 0) {
@@ -222,18 +226,23 @@
                 return v;
             }
             return vector([v.x / norm, v.y / norm, v.z / norm]);
-        }
+        };
         v.floor = function() {
             return vector([Math.floor(v.x), Math.floor(v.y), Math.floor(v.z)]);
-        }
+        };
         v.cross = function(w) {
-            return vector([v.y * w.z - v.z * w.y, v.z * w.x - v.x * w.z, v.x * w.y - v.y * w.x]);
-        }
+            return vector([
+                v.y * w.z - v.z * w.y,
+                v.z * w.x - v.x * w.z,
+                v.x * w.y - v.y * w.x
+            ]);
+        };
         v.exceeds = function(a) {
             return v.x > a || v.y > a || v.z > a;
-        }
+        };
+
         return v;
-    }
+    };
 
     //matrix operations that we'll be needing for transformations
     var matrix = function(rows, colums) {
@@ -261,7 +270,7 @@
                 }
             }
             return newmat;
-        }
+        };
         //homogeneous multiplication of this matrix by vect augmented by fourth
         m.homomult = function(vect, fourth) {
             var i, j;
@@ -280,7 +289,7 @@
             } else {
                 return vector([result[0], result[1], result[2]]);
             }
-        }
+        };
         m.transpose = function() {
             var i, j;
             var ret = matrix(m.colums, m.rows);
@@ -290,44 +299,47 @@
                 }
             }
             return ret;
-        }
+        };
         return m;
-    }
+    };
 
     //gives you the rotation matrix of theta radians about axis axis
     var rotation = function(axis, theta) {
         var ret = matrix(4, 4);
-        if (axis == "x") {
+        if (axis === "x") {
             ret.data[1][1] = Math.cos(theta);
             ret.data[1][2] = -Math.sin(theta);
             ret.data[2][1] = Math.sin(theta);
             ret.data[2][2] = Math.cos(theta);
         }
-        if (axis == "y") {
+
+        if (axis === "y") {
             ret.data[0][0] = Math.cos(theta);
             ret.data[0][2] = -Math.sin(theta);
             ret.data[2][0] = Math.sin(theta);
             ret.data[2][2] = Math.cos(theta);
         }
-        if (axis == "z") {
+
+        if (axis === "z") {
             ret.data[0][0] = Math.cos(theta);
             ret.data[0][1] = -Math.sin(theta);
             ret.data[1][0] = Math.sin(theta);
             ret.data[1][1] = Math.cos(theta);
         }
+
         return ret;
-    }
+    };
     var zeros = function(n) {
         var result = [];
         for (var kthzero = 0; kthzero < n; kthzero++) {
             result.push(0);
         }
         return result;
-    }
+    };
 
     //read the input file
     var inputFile = new XMLHttpRequest();
-    inputFile.open("GET", "http://localhost:12345/five-ellipsoids", false);
+    inputFile.open("GET", "http://localhost:12345/three-circles-and-triangle", false);
     inputFile.overrideMimeType("application/json");
     inputFile.send(null);
     var objects = JSON.parse(inputFile.responseText);
@@ -400,7 +412,7 @@
     //draw the picture
     var shapes = shapeobject(objects["shapes"]);
     var rayt = raytracer(shapes, lights, cam.origin, 5);
-    var picture = scene(cam, rayt, imgData);
+    scene(cam, rayt, imgData);
     ctx.putImageData(imgData, 0, 0);
 
     //profit
