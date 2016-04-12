@@ -13,7 +13,7 @@ func Panick(err error) {
 }
 
 func WriteImage(img *image.RGBA) {
-	f, err := os.Create("draww.png")
+	f, err := os.Create("draw.png")
 	if err != nil {
 		panic(err)
 	}
