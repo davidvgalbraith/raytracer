@@ -1,6 +1,9 @@
 package geometry
 
-import ("math")
+import (
+	"math"
+	"math/rand"
+)
 
 type Vector struct {
 	X float64
@@ -55,4 +58,20 @@ func (v1 Vector) Cross(v2 Vector) Vector {
 	z := v1.X * v2.Y - v1.Y * v2.X
 
 	return BuildVector([]float64{x, y, z})
+}
+
+func (v Vector) Abs() Vector {
+	return BuildVector([]float64{math.Abs(v.X), math.Abs(v.Y), math.Abs(v.Z)})
+}
+
+func (v Vector) Contains(value float64) bool {
+	return v.X == value || v.Y == value || v.Z == value
+}
+
+func (v Vector) Jitter() Vector {
+	return BuildVector([]float64{randy(v.X), randy(v.Y), randy(v.Z)})
+}
+
+func randy(input float64) float64 {
+	return input + (rand.Float64() / 5.0)
 }

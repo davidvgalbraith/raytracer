@@ -57,6 +57,7 @@ func trace(ray Ray, scene Scene) color.RGBA {
 				// we hit anything along the way we know it's blocked
 				lightRay := BuildRay(normal.Position, BuildVector(light.Direction).Times(-1))
 				_, _, lightBlocked := scene.Intersect(lightRay)
+
 				if !lightBlocked {
 					colorVector = colorVector.Plus(diffuse(light, lightRay, shading, normal))
 					colorVector = colorVector.Plus(specular(light, lightRay, shading, normal, origin))
@@ -93,6 +94,8 @@ func diffuse(light Light, lightRay Ray, shading Shading, normal Ray) Vector {
 	l := lightRay.Direction.Normalize()
 	dot := l.Dot(normal.Direction)
 	kd := BuildVector(shading.Diffuse)
+
+	println(dot)
 
 	return BuildVector(light.Color).Vtimes(kd).Times(dot)
 }

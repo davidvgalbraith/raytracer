@@ -3,6 +3,7 @@ package common
 import (
     "image"
     "image/png"
+    "math"
     "os"
 )
 
@@ -35,4 +36,22 @@ func TernaryFloat(condition bool, ifFloat float64, elseFloat float64) float64 {
     } else {
         return elseFloat
     }
+}
+
+func Min(nums ... float64) float64 {
+    min := math.Inf(1)
+    for _, num := range nums {
+        min = math.Min(min, num)
+    }
+
+    return min
+}
+
+func Max(nums ... float64) float64 {
+    min := math.Inf(-1)
+    for _, num := range nums {
+        min = math.Max(min, num)
+    }
+
+    return min
 }

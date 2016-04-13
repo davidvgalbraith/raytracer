@@ -32,7 +32,7 @@ The Java tracer has its own input format, described in the Java section. It's a 
 
 ### Go
 
-To run the Go ray tracer, check out the code, set your GOPATH to the `raytracer/` directory, and run
+To run the Go ray tracer, checkout the code, set your GOPATH to the `raytracer/` directory, and run
 
 ```
 go run go/src/raytracer/main.go [input file]

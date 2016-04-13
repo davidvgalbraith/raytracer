@@ -23,6 +23,8 @@ type ShapeCard struct {
     Rotation Vector
     Shading Shading
     Vertices [][]float64
+    Min []float64
+    Max []float64
 }
 
 type Scene struct {
@@ -105,6 +107,14 @@ func GetScene() Scene {
                 }
 
                 scene.Shapes = append(scene.Shapes, triangle)
+            case "box":
+                box := Box{
+                    Min: shapeCard.Min,
+                    Max: shapeCard.Max,
+                    Shading: shapeCard.Shading,
+                }
+
+                scene.Shapes = append(scene.Shapes, box)
         }
     }
 

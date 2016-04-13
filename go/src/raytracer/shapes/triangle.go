@@ -1,6 +1,7 @@
 package shapes
 
 import (
+    . "raytracer/common"
     . "raytracer/scene_objects"
     . "raytracer/geometry"
     "math"
@@ -32,7 +33,7 @@ func (triangle Triangle) Intersect(ray Ray) (time float64, normal Ray) {
     gamma := rayDirection.Dot(cross2) / m
     t := -1 * edge2.Dot(cross2) / m
 
-    if (t < 0.001 || gamma < 0 || gamma > 1 || beta < 0 || beta > 1 - gamma) {
+    if (t < MIN_INTERSECTION_TIME || gamma < 0 || gamma > 1 || beta < 0 || beta > 1 - gamma) {
         return math.Inf(1), Ray{}
     }
 
