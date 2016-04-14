@@ -20,22 +20,22 @@ func (c Box) Intersect(ray Ray) (time float64, normal Ray) {
 
     var tmin, tmax, tymin, tymax, tzmin, tzmax float64
 
-    tmin = (min.X - ray.Position.X) / ray.Direction.X
-    tmax = (max.X - ray.Position.X) / ray.Direction.X
-
-    if (tmin > tmax) {
-        temp := tmax
-        tmax = tmin
-        tmin = temp
+    divx := 1.0 / ray.Direction.X
+    if divx >= 0 {
+        tmin = (min.X - ray.Position.X) * divx
+        tmax = (max.X - ray.Position.X) * divx
+    } else {
+        tmin = (max.X - ray.Position.X) * divx
+        tmax = (min.X - ray.Position.X) * divx
     }
 
-    tymin = (min.Y - ray.Position.Y) / ray.Direction.Y
-    tymax = (max.Y - ray.Position.Y) / ray.Direction.Y
-
-    if (tymin > tymax) {
-        tmemp := tymax
-        tymax = tymin
-        tymin = tmemp
+    divy := 1.0 / ray.Direction.Y
+    if divy >= 0 {
+        tymin = (min.Y - ray.Position.Y) * divy
+        tymax = (max.Y - ray.Position.Y) * divy
+    } else {
+        tymin = (max.Y - ray.Position.Y) * divy
+        tymax = (min.Y - ray.Position.Y) * divy
     }
 
     if tmin > tymax || tymin > tymax {
@@ -50,13 +50,13 @@ func (c Box) Intersect(ray Ray) (time float64, normal Ray) {
         tmax = tymax
     }
 
-    tzmin = (min.Z - ray.Position.Z) / ray.Direction.Z
-    tzmax = (max.Z - ray.Position.Z) / ray.Direction.Z
-
-    if (tzmin > tzmax) {
-        horror := tzmax
-        tzmax = tzmin
-        tzmin = horror
+    divz := 1.0 / ray.Direction.Z
+    if divz >= 0 {
+        tzmin = (min.Z - ray.Position.Z) * divz
+        tzmax = (max.Z - ray.Position.Z) * divz
+    } else {
+        tzmin = (max.Z - ray.Position.Z) * divz
+        tzmax = (min.Z - ray.Position.Z) * divz
     }
 
     if (tmin > tzmax || tzmin > tmax) {
@@ -71,7 +71,7 @@ func (c Box) Intersect(ray Ray) (time float64, normal Ray) {
         tmax = tzmax
     }
 
-    if tmin < 0 {
+    if tmin < 0 || tmax < tmin {
         return math.Inf(1), Ray{}
     }
 
@@ -108,10 +108,6 @@ func getNormal(intersection, min, max Vector) Ray {
     if distToMin.Contains(minDist) {
         result = result.Times(-1)
     }
-
-    println(x, y, z)
-
-    // if (intersection.Z != -12.0) {println(intersection.Z, result.Y, result.Z)}
 
     return BuildRay(intersection, result.Jitter().Normalize())
 }

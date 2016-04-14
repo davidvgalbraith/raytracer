@@ -95,8 +95,6 @@ func diffuse(light Light, lightRay Ray, shading Shading, normal Ray) Vector {
 	dot := l.Dot(normal.Direction)
 	kd := BuildVector(shading.Diffuse)
 
-	println(dot)
-
 	return BuildVector(light.Color).Vtimes(kd).Times(dot)
 }
 

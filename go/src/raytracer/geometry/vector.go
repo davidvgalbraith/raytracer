@@ -73,5 +73,6 @@ func (v Vector) Jitter() Vector {
 }
 
 func randy(input float64) float64 {
-	return input + (rand.Float64() / 5.0)
+	jitter := (rand.Float64() / 4.0)
+	return input + jitter
 }
