@@ -78,5 +78,5 @@ func getNormal(intersection, min, max Vector) Ray {
 		result = result.Times(-1)
 	}
 
-	return BuildRay(intersection, result.Jitter().Normalize())
+	return BuildRay(intersection, result.Normalize())
 }

@@ -6,6 +6,7 @@ type Shading struct {
 	Reflection        []float64
 	Specular          []float64
 	Specular_Exponent float64
+	Texture           string
 }
 
 type Camera struct {

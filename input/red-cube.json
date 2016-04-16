@@ -29,6 +29,7 @@
             "min":[ -1, 1, -17 ],
             "max":[ 3, 3, -11],
             "shading": {
+                "texture": "bump",
                 "ambient":[ 0.1,  0.1,  0.1 ],
                 "diffuse":[ 1,  0,  0 ],
                 "reflection":[ 0.9, 0.9,  0.9 ],

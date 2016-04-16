@@ -47,6 +47,9 @@ func trace(ray Ray, scene Scene) color.RGBA {
 
 		shading := shape.GetShading()
 		ambient := BuildVector(shading.Ambient)
+		if shading.Texture == "bump" {
+			normal.Direction = normal.Direction.Jitter().Normalize()
+		}
 
 		colorVector := BuildVector([]float64{0, 0, 0})
 
