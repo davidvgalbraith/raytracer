@@ -3,6 +3,7 @@ package geometry
 import (
 	"math"
 	"math/rand"
+	. "raytracer/common"
 )
 
 type Vector struct {
@@ -75,4 +76,20 @@ func (v Vector) Jitter() Vector {
 func randy(input float64) float64 {
 	jitter := (rand.Float64() / 4.0)
 	return input + jitter
+}
+
+func Vmin(v1, v2 Vector) Vector {
+	return BuildVector([]float64{
+		Min(v1.X, v2.X),
+		Min(v1.Y, v2.Y),
+		Min(v1.Z, v2.Z),
+	})
+}
+
+func Vmax(v1, v2 Vector) Vector {
+	return BuildVector([]float64{
+		Max(v1.X, v2.X),
+		Max(v1.Y, v2.Y),
+		Max(v1.Z, v2.Z),
+	})
 }

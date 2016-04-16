@@ -28,41 +28,41 @@ type ShapeCard struct {
 }
 
 type Scene struct {
-	Name string
-	Camera Camera
-	Lights []Light
-	ShapeCards []ShapeCard `json:"shapes"`
+    Name string
+    Camera Camera
+    Lights []Light
+    ShapeCards []ShapeCard `json:"shapes"`
     Shapes []Shape
 }
 
 func (s Scene) Intersect(ray Ray) (shape Shape, normal Ray, didIntersect bool) {
-	thit := math.Inf(1)
-	var closestShape Shape
-	var closestNormal Ray
+    thit := math.Inf(1)
+    var closestShape Shape
+    var closestNormal Ray
 
-	for _, shape := range s.Shapes {
-		time, normal := shape.Intersect(ray)
-		if time < thit {
-			thit = time
-			closestShape = shape
-			closestNormal = normal
-		}
-	}
+    for _, shape := range s.Shapes {
+        time, normal := shape.Intersect(ray)
+        if time < thit {
+            thit = time
+            closestShape = shape
+            closestNormal = normal
+        }
+    }
 
-	return closestShape, closestNormal, thit < math.Inf(1)
+    return closestShape, closestNormal, thit < math.Inf(1)
 }
 
 func GetScene() Scene {
-	if len(os.Args) < 2 {
-		panic("specify a JSON file containing a scene")
-	}
-	file := os.Args[1]
-	configFile, err := os.Open(file)
-	Panick(err)
+    if len(os.Args) < 2 {
+        panic("specify a JSON file containing a scene")
+    }
+    file := os.Args[1]
+    configFile, err := os.Open(file)
+    Panick(err)
 
-	jsonParser := json.NewDecoder(configFile)
-	var scene Scene
-	Panick(jsonParser.Decode(&scene))
+    jsonParser := json.NewDecoder(configFile)
+    var scene Scene
+    Panick(jsonParser.Decode(&scene))
     for _, shapeCard := range scene.ShapeCards {
         switch shapeCard.Type {
             case "sphere":
@@ -118,5 +118,5 @@ func GetScene() Scene {
         }
     }
 
-	return scene
+    return scene
 }
