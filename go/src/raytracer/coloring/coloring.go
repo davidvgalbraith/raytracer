@@ -3,8 +3,8 @@ package coloring
 import (
 	"image/color"
 	"math"
-	. "raytracer/geometry"
 	. "raytracer/common"
+	. "raytracer/geometry"
 	. "raytracer/scene"
 	. "raytracer/scene_objects"
 )
@@ -22,8 +22,8 @@ func CalculateColor(scene Scene, x, y int) color.RGBA {
 	ur := BuildVector(viewPlane.Upper_Right)
 	ll := BuildVector(viewPlane.Lower_Left)
 
-	xpos := ul.X + (fx / pixelsX) * (ur.X - ul.X) + 1.0 / (2 * pixelsX)
-	ypos := ul.Y + (fy / pixelsY) * (ll.Y - ul.Y) + 1.0 / (2 * pixelsY)
+	xpos := ul.X + (fx/pixelsX)*(ur.X-ul.X) + 1.0/(2*pixelsX)
+	ypos := ul.Y + (fy/pixelsY)*(ll.Y-ul.Y) + 1.0/(2*pixelsY)
 	screenpos := BuildVector([]float64{xpos, ypos, ul.Z})
 	eyeRay := BuildRay(origin, screenpos)
 
@@ -31,15 +31,19 @@ func CalculateColor(scene Scene, x, y int) color.RGBA {
 }
 
 func trace(ray Ray, scene Scene) color.RGBA {
-	var origin Vector;
+	var origin Vector
 	var traceWithReflections func(ray Ray, scene Scene, numReflections int) Vector
 	traceWithReflections = func(ray Ray, scene Scene, numReflections int) Vector {
 		origin = ray.Position
-		if (numReflections > MAX_REFLECTIONS) { return ZERO_VECTOR }
+		if numReflections > MAX_REFLECTIONS {
+			return ZERO_VECTOR
+		}
 
 		shape, normal, didIntersect := scene.Intersect(ray)
 
-		if (!didIntersect) { return ZERO_VECTOR }
+		if !didIntersect {
+			return ZERO_VECTOR
+		}
 
 		shading := shape.GetShading()
 		ambient := BuildVector(shading.Ambient)
@@ -67,7 +71,7 @@ func trace(ray Ray, scene Scene) color.RGBA {
 		reflection := BuildVector(shading.Reflection)
 		if reflection.X > 0.0 || reflection.Y > 0.0 || reflection.Z > 0.0 {
 			reflectRay := calculateReflectRay(ray, normal)
-			reflectionColor := traceWithReflections(reflectRay, scene, numReflections + 1).Vtimes(reflection)
+			reflectionColor := traceWithReflections(reflectRay, scene, numReflections+1).Vtimes(reflection)
 			colorVector = colorVector.Plus(reflectionColor)
 		}
 
@@ -116,6 +120,8 @@ func specular(light Light, lightRay Ray, shading Shading, normal Ray, origin Vec
 }
 
 func floor(x float64) uint8 {
-	if (x > MAX_COLOR) { return MAX_COLOR }
+	if x > MAX_COLOR {
+		return MAX_COLOR
+	}
 	return uint8(math.Floor(x))
 }

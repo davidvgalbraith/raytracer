@@ -1,7 +1,7 @@
 package geometry
 
 type Ray struct {
-	Position Vector
+	Position  Vector
 	Direction Vector
 }
 
@@ -11,7 +11,7 @@ func (r Ray) ValueAt(time float64) Vector {
 
 func BuildRay(position, direction Vector) Ray {
 	return Ray{
-		Position: position,
+		Position:  position,
 		Direction: direction,
 	}
 }

@@ -2,9 +2,9 @@ package main
 
 import (
 	"image"
+	"raytracer/coloring"
 	"raytracer/common"
 	"raytracer/scene"
-	"raytracer/coloring"
 )
 
 func main() {

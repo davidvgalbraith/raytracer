@@ -43,20 +43,22 @@ func (v1 Vector) Dot(v2 Vector) float64 {
 }
 
 func (v Vector) Norm() float64 {
-	return math.Sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);
+	return math.Sqrt(v.X*v.X + v.Y*v.Y + v.Z*v.Z)
 }
 
 func (v Vector) Normalize() Vector {
 	norm := v.Norm()
-	if norm == 0 { panic("Tried to normalize a zero vector") }
+	if norm == 0 {
+		panic("Tried to normalize a zero vector")
+	}
 
 	return BuildVector([]float64{v.X / norm, v.Y / norm, v.Z / norm})
 }
 
 func (v1 Vector) Cross(v2 Vector) Vector {
-	x := v1.Y * v2.Z - v1.Z * v2.Y
-	y := v1.Z * v2.X - v1.X * v2.Z
-	z := v1.X * v2.Y - v1.Y * v2.X
+	x := v1.Y*v2.Z - v1.Z*v2.Y
+	y := v1.Z*v2.X - v1.X*v2.Z
+	z := v1.X*v2.Y - v1.Y*v2.X
 
 	return BuildVector([]float64{x, y, z})
 }
