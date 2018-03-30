@@ -66,14 +66,13 @@ func GetScene() Scene {
 	for _, shapeCard := range scene.ShapeCards {
 		switch shapeCard.Type {
 		case "sphere":
-			sphere := Sphere{
+			scene.Shapes = append(scene.Shapes, Sphere{
 				Center:     shapeCard.Center,
 				Radius:     shapeCard.Radius,
 				Shading:    shapeCard.Shading,
 				ObjToWorld: Identity(4, 4),
 				WorldToObj: Identity(4, 4),
-			}
-			scene.Shapes = append(scene.Shapes, sphere)
+			})
 		case "ellipsoid":
 			radii := shapeCard.Radii
 			center := BuildVector(shapeCard.Center)
@@ -91,32 +90,25 @@ func GetScene() Scene {
 
 			worldToObj := worldToObjScale.Times(worldToObjRotate.Times(worldToObjTranslate))
 
-			ellipsoid := Sphere{
+			scene.Shapes = append(scene.Shapes,  Sphere{
 				Center:     []float64{0.0, 0.0, 0.0},
 				Radius:     1.0,
 				Shading:    shapeCard.Shading,
 				ObjToWorld: objToWorld,
 				WorldToObj: worldToObj,
-			}
-
-			scene.Shapes = append(scene.Shapes, ellipsoid)
+			})
 		case "triangle":
-			triangle := Triangle{
+			scene.Shapes = append(scene.Shapes, Triangle{
 				Vertices: shapeCard.Vertices,
 				Shading:  shapeCard.Shading,
-			}
-
-			scene.Shapes = append(scene.Shapes, triangle)
+			})
 		case "box":
-			box := Box{
+			scene.Shapes = append(scene.Shapes,  Box{
 				Min:     shapeCard.Min,
 				Max:     shapeCard.Max,
 				Shading: shapeCard.Shading,
-			}
-
-			scene.Shapes = append(scene.Shapes, box)
+			})
 		}
 	}
-
 	return scene
 }
